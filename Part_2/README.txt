@@ -81,7 +81,8 @@ Rules of Engagement:
 	- testFunctionNameFunction: provides a way for you to test your function implementation on the 
           files in the dataset folder
 5. If you create additional code to help you analyze data or otherwise help you implement your function, 
-   put them in 1 or more additional files within the function's folder.
+   put them in 1 or more additional files within the function's folder. Don't forget; we are interested 
+   in both your solution and your thought process.
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
