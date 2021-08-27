@@ -1,9 +1,9 @@
 %% Here's an example of the ideal output for a given input
-data_table = readtable('dataset/upstairs_fast_R.csv');
+data_table = readtable('dataset/nick_walking_0incline_left.csv');
 exampleGroundSlopePredictions = exampleCalculateGroundSlope(data_table);
 
 function exampleGroundSlopePredictions = exampleCalculateGroundSlope(data_table)
-    exampleGroundSlopePredictions = data_table.incline;
+    exampleGroundSlopePredictions = zeros(size(data_table.incline));
     
     figure
     plot(data_table.incline, 'b')

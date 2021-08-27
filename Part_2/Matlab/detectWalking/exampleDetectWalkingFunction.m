@@ -1,5 +1,5 @@
 %% Here's an example of the ideal output for a given input
-data_table = readtable('dataset/upstairs_fast_R.csv');
+data_table = readtable('dataset/rachel_walking_3mph_left.csv');
 exampleDetectWalkingPredictions = exampleDetectWalking(data_table);
 
 function exampleDetectWalkingPredictions = exampleDetectWalking(data_table)

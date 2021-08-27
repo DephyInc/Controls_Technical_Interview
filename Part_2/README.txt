@@ -18,17 +18,16 @@ users and movements.
 
 With all this information you start brainstorming ways to recreate those ankle torques on 
 the ExoBoot and you have a lot of questions: Based on this dataset, when do our users prefer 
-to get zero torque? When do they prefer the torque to peak? Can we use gait phase (when the 
-foot is on the ground vs when it isn’t) to understand how/when to go from zero torque to peak 
-torque? Can we use the ankle’s linear position and velocity to understand how/when to go from 
-zero torque to peak torque? Can we detect when a user is not walking so that we make sure the 
-exo doesn’t hinder those movements?
+to get peak ankle torque? Can we use gait phase (when the foot is on the ground vs when it 
+isn’t) to understand how/when to go from zero torque to peak torque? Can we predict when users 
+are going uphill and use that to understand how/when/what the peak torque should be? Can we 
+detect when a user is not walking so that we make sure the exo doesn’t hinder those movements?
 
 You know you can’t prototype solutions for all your questions, but want to see if you can address 
-one of them and show your team a quick proof of concept on them so you can decide how to move 
-forward with the project.
+one of them and show your team a quick proof of concept so you can decide how to move forward 
+with the project.
 
-Side note:  In your attempts to make a proof of concept, you enlist a junior software engineer 
+Side note: In your attempts to make a proof of concept, you enlist a junior software engineer 
 to make some quick helper functions for you. You get the helper functions back from them and 
 notice that they’re functional, but could be implemented better. You decide to use this as a 
 teaching moment and provide a code review for your coworker.
@@ -39,7 +38,6 @@ Candidate Action Items:
 
 1. Given the provided datasets, create a basic implementation for 1 of the following functions: 
 	- predictPeakTorque
-	- predictZeroTorque
 	- detectWalking
 	- isUserInStance
 	- calculateGroundSlope
@@ -50,7 +48,7 @@ Candidate Action Items:
 
 3. Please fill out the following:
 
-	Did you implement Tasks 1 in C, Matlab, or Python? _______________________
+	Did you implement Task 1 in C, Matlab, or Python? _______________________
 
 	Which function did you choose to implement for Task 1? __________________________
 	Briefly describe your implementation (1-3 sentences).

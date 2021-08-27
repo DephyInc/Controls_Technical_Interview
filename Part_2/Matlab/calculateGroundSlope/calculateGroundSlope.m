@@ -10,7 +10,8 @@
 % Output:
 % groundSlopePredictions >> an N x 1 double, where each element in the array
 % represents the % grade of the ground the user is currently moving over
-% (i.e. the method should be a rough prediction of the value of data_table.incline(n)) 
+% (i.e. the method should be a rough prediction of the value of data_table.incline(n), 
+% though hopefully your prediction is much better than ours) 
 
 function groundSlopePredictions = calculateGroundSlope(data_table)
     % This is a placeholder so the code will run. Replace this with your
