@@ -1,9 +1,9 @@
 %% Test your code by running the following
 close all;
 clear all;
-testIsUserInStance();
+testCalculateGroundSlope();
 
-function testIsUserInStance()
+function testCalculateGroundSlope()
     files = dir('dataset');
     files = files(3:end,1);
 
@@ -11,11 +11,11 @@ function testIsUserInStance()
         filename = files(i).name;
         data_table = readtable(strcat('dataset/',filename));
         
-        isUserInStancePredictions = isUserInStance(data_table);
+        groundSlopePredictions = calculateGroundSlope(data_table);
         
         figure
-        plot(data_table.gait_state, 'b')
+        plot(data_table.incline, 'b')
         hold on;
-        plot(isUserInStancePredictions,'r')
+        plot(groundSlopePredictions,'r')
     end
 end

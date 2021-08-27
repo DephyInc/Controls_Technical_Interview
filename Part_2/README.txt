@@ -42,7 +42,7 @@ Candidate Action Items:
 	- predictZeroTorque
 	- detectWalking
 	- isUserInStance
-	- calculateAnkleState
+	- calculateGroundSlope
 
 2. Review the file of helper functions. Within the file, implement changes that would improve 
    the quality of the file.
@@ -86,6 +86,24 @@ Rules of Engagement:
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+Some biomechanics notes:
+
+1. There are multiple ways to solve these tasks and you DO NOT need any biomechanics background to 
+   solve any of them, so if that's not you're background or approach, that's okay. In case it's useful, 
+   we've defined a couple of terms below:
+	- Heelstrike: when your heel hits the ground at the beginning of a step
+	- Stance: the phase of the step in which your foot is on the ground
+	- Swing: the phase of the step in which your foot is in the air
+	- Step: the movement from heelstrike to heelstrike on the SAME foot
+
+2. For those WITH biomechanics background, please take note of the following, because our conventions 
+   are likely different than what you learned:
+	- A single step starts at heelstrike and ends when that SAME foot heelstrikes again
+	- Positive ankle velocities correspond to plantarflexion. Negative ankle velocities correspond 
+	  to dorsiflexion.
+ 
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 A few more useful details:
 
 The datasets provided are different for each problem and include a variety of files that correspond to 
@@ -116,6 +134,9 @@ ________________________________________________________________________________
 gait_state 			Describes whether the user 	N/A			<0 = unknown
 				is in stance or swing 					0 = swing
 											1 = stance
+											At heelstrike (i.e. when a user 
+											begin's a new step, gait_state 
+											will typically go from 0 to 1)
 ___________________________________________________________________________________________________________________________
 ank_torque 			How much ankle torque the 	mNm
 				user is receiving
