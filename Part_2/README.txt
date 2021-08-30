@@ -17,11 +17,12 @@ the ankle joint of an ankle exo very similar to the exoboot and includes data fr
 users and movements. 
 
 With all this information you start brainstorming ways to recreate those ankle torques on 
-the ExoBoot and you have a lot of questions: Based on this dataset, when do our users prefer 
-to get peak ankle torque? Can we use gait phase (when the foot is on the ground vs when it 
-isn’t) to understand how/when to go from zero torque to peak torque? Can we predict when users 
-are going uphill and use that to understand how/when/what the peak torque should be? Can we 
-detect when a user is not walking so that we make sure the exo doesn’t hinder those movements?
+the ExoBoot and you have a lot of questions: Based on this dataset, how might we calculate how 
+much ankle torque our user's prefer during each part of their step? Can we use gait phase 
+(when the foot is on the ground vs when it isn’t) to understand how/when to go from zero torque 
+to peak torque? Can we predict when users are going uphill and use that to understand how/when/what 
+the peak torque should be? Can we detect when a user is not walking so that we make sure the 
+exo doesn’t hinder those movements?
 
 You know you can’t prototype solutions for all your questions, but want to see if you can address 
 one of them and show your team a quick proof of concept so you can decide how to move forward 
@@ -37,18 +38,19 @@ teaching moment and provide a code review for your coworker.
 Candidate Action Items:
 
 1. Given the provided datasets, create a basic implementation for 1 of the following functions: 
-	- predictPeakTorque
+	- predictAnkleTorque
 	- detectWalking
 	- isUserInStance
 	- calculateGroundSlope
+   Keep in mind that the ultimate goal would be to try your implementation out in real time, 
+   on a real device, on a real human.
 
 2. Review the file of helper functions. Within the file, implement changes that would improve 
    the quality of the file.
 
-
 3. Please fill out the following:
 
-	Did you implement Task 1 in C, Matlab, or Python? _______________________
+	Did you implement Task 1 in Matlab or Python? _______________________
 
 	Which function did you choose to implement for Task 1? __________________________
 	Briefly describe your implementation (1-3 sentences).
@@ -62,7 +64,7 @@ Rules of Engagement:
 0. We don't expect you to spend more than 4 hours working on this technical challenge. Do what you can 
    in that time. If you want to work more feel free, but please push your final solution within 24 hours 
    of receiving this task, as that is when we will pull your branch and evaluate your solution.
-1. You may implement your solution for Task 1 in either C, Matlab, or Python. 
+1. You may implement your solution for Task 1 in either Matlab or Python. 
 2. If you choose to implement in Python, you may only use the following non-standard libraries:
 	- numpy
 	- matplotlib

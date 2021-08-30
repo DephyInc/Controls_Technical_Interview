@@ -1,9 +1,9 @@
 %% Test your code by running the following
 close all;
 clear all;
-testPredictPeakTorque();
+testPredictAnkleTorque();
 
-function testPredictPeakTorque()
+function testPredictAnkleTorque()
     files = dir('dataset');
     files = files(3:end,1);
 
@@ -11,11 +11,11 @@ function testPredictPeakTorque()
         filename = files(i).name;
         data_table = readtable(strcat('dataset/',filename));
         
-        peakTorquePredictions = predictPeakTorque(data_table);
+        ankleTorquePredictions = predictAnkleTorque(data_table);
         
         figure
         plot(data_table.ank_torque, 'b')
         hold on;
-        plot(peakTorquePredictions,'r')
+        plot(ankleTorquePredictions,'r')
     end
 end
