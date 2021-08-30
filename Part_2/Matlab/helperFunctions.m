@@ -1,7 +1,7 @@
 %% Run the file for an example of how to use the helper functions
 % If you want to actually use these functions within your function 
 % implementation, just copy and paste the function into your file
-data_table = load_csv_file('detectWalking/dataset/upstairs_fast_R.csv');
+data_table = load_csv_file('detectWalking/dataset/rachel_walking_3mph_left.csv');
 figure
 plot(data_table.ank_ang)
 
