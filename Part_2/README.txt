@@ -69,7 +69,7 @@ Rules of Engagement:
 	- numpy
 	- matplotlib
 	- scipy
-	- if necessary you can use simple standard libaries like (os, sys, math, etc) 
+	- if necessary you can use simple standard libaries like (os, sys, math, copy, etc) 
 3. If you choose to implement in Matlab, DO NOT use any functions from non-standard toolboxes or add-ons.
 4. Which function you choose to implement will dictate which folder of the repo you work in. However, 
    each folder contains the following files/folders:
