@@ -9,17 +9,17 @@ np.warnings.filterwarnings('ignore', category=np.VisibleDeprecationWarning)
 def main():
 	data_array = load_csv_file('detectWalking/dataset/rachel_walking_3mph_left.csv')
 	mplt.figure(1)
-	mplt.plot(data_array[:,33])
+	mplt.plot(data_array[:,variable_name_to_column_index('ank_ang')])
 	mplt.draw()
 
 	steps = get_step_cycle_data_from_data_table(data_array)
 	average_step = get_average_step(steps)
 	mplt.figure(2)
-	mplt.plot(average_step[:,33])
+	mplt.plot(average_step[:,variable_name_to_column_index('ank_ang')])
 	mplt.draw()
 
 	mplt.figure(3)
-	plot_variable_by_step(data_array,33)
+	plot_variable_by_step(data_array,'ank_ang')
 	mplt.draw()
 
 	mplt.show()
@@ -89,6 +89,7 @@ def get_average_step(steps):
 plots a given variable by step (i.e. presumably the data we've provided 
 you is somewhat periodic. this function allows you to break the data down 
 and plot each individual period)
+note: variable should be a string
 '''
 def plot_variable_by_step(data_array,variable):
 	HS = getHSindices(data_array)
@@ -100,15 +101,15 @@ def plot_variable_by_step(data_array,variable):
 		steps[k] = cycle
 	
 	for k in range(0,len(steps)):
-		mplt.plot(steps[k][:,variable])
+		mplt.plot(steps[k][:,variable_name_to_column_index(variable)])
 
 '''
-% returns the indices of the rows of the data table in which a heelstrike occurs
-% (heelstrike is when your foot first touches the ground at the beginning
-% of a step)
+returns the indices of the rows of the data table in which a heelstrike occurs
+(heelstrike is when your foot first touches the ground at the beginning
+of a step)
 '''
 def getHSindices(data_array):
-	HS = DetectPosZC(0,data_array[:,40])
+	HS = DetectPosZC(0,data_array[:,variable_name_to_column_index('gait_state')])
 	
 	return HS
 
@@ -121,6 +122,23 @@ def DetectPosZC(offset,data):
 	ZC = ZC.astype('int64')
 	
 	return ZC
+
+'''
+returns the column index of the given variable name in a data_array, 
+assuming the data array is in the same general format/order as the data in the csv logs 
+'''
+def variable_name_to_column_index(variable_name):
+	possible_variables = ['state_time','accelx','accely','accelz','gyrox','gyroy','gyroz','mot_ang','mot_vel','mot_acc','mot_cur','mot_volt','batt_volt','batt_curr','temperature','status_mn','status_ex','status_re','genvar_0','genvar_1','genvar_2','genvar_3','genvar_4','genvar_5','genvar_6','genvar_7','genvar_8','genvar_9','genvar_10','genvar_11','genvar_12','genvar_13','genvar_14','ank_ang','ank_vel','ank_torque','peak_ank_torque','step_energy','step_count','step_time','gait_state','movement','speed','incline','sys_time','event flags']
+
+	variable_index = 0
+
+	for variable in possible_variables:
+		if variable == variable_name:
+			return variable_index
+		
+		variable_index += 1
+
+	return -1
 
 if __name__ == "__main__":
 	main()
