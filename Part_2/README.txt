@@ -68,6 +68,7 @@ Rules of Engagement:
 2. If you choose to implement in Python, you may only use the following non-standard libraries:
 	- numpy
 	- matplotlib
+		(if matplotlib doesn't work because of a kiwisolver error, try uninstalling and reinstalling kiwisolver)
 	- scipy
 	- if necessary you can use simple standard libaries like (os, sys, math, copy, etc) 
 3. If you choose to implement in Matlab, DO NOT use any functions from non-standard toolboxes or add-ons.
