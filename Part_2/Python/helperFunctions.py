@@ -5,7 +5,16 @@ np.warnings.filterwarnings('ignore', category=np.VisibleDeprecationWarning)
 
 # Run the file for an example of how to use the helper functions
 # If you want to actually use these functions within your function 
-# implementation, just copy and paste the function into your file
+# implementation, either: 
+# 1) just copy and paste the function into your file
+# OR
+# 2) import the helper functions file using the following, or something similar
+# import os, sys
+# currentdir = os.path.dirname(os.path.realpath(__file__))
+# parentdir = os.path.dirname(currentdir)
+# sys.path.append(parentdir)
+# import helperFunctions as hf
+
 def main():
 	data_array = load_csv_file('detectWalking/dataset/rachel_walking_3mph_left.csv')
 	mplt.figure(1)
