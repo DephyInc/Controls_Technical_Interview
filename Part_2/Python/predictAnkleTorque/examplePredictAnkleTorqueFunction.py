@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from copy import deepcopy
 import numpy as np
 import matplotlib.pyplot as mplt
 import os, sys
@@ -9,7 +10,7 @@ import helperFunctions as hf
 np.warnings.filterwarnings('ignore', category=np.VisibleDeprecationWarning)
 
 def examplePredictAnkleTorque(data_array):
-	exampleAnkleTorquePredictions = data_array[:,hf.variable_name_to_column_index('ank_torque')]
+	exampleAnkleTorquePredictions = deepcopy(data_array[:,hf.variable_name_to_column_index('ank_torque')])
 
 	return exampleAnkleTorquePredictions
 

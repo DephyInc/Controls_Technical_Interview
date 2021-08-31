@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from copy import deepcopy
 import os, sys
 currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
@@ -26,5 +27,5 @@ represents how much ankle torque the user would like to receive at this point in
 def predictAnkleTorque(data_array):
     # This is a placeholder so the code will run. Replace this with your
     # implementation.
-    ankleTorquePredictions = data_array[:,hf.variable_name_to_column_index('ank_torque')]
+    ankleTorquePredictions = deepcopy(data_array[:,hf.variable_name_to_column_index('ank_torque')])
     return ankleTorquePredictions
