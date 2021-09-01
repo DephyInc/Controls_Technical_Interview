@@ -114,8 +114,8 @@ def plot_variable_by_step(data_array, variable):
 		cycle = data_array[hsi[k] : hsi[k + 1], :]
 		steps[k] = cycle
 
-	for step in steps:
-		mplt.plot(step[:, variable_name_to_column_index(variable)])
+	for k in range(0, len(steps)):
+		mplt.plot(steps[k][:, variable_name_to_column_index(variable)])
 
 
 def get_hs_indices(data_array):
