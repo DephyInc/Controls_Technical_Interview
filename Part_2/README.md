@@ -10,8 +10,6 @@ You know you can’t prototype solutions for all your questions, but want to see
 
 **Side Note**: In your attempts to make a proof of concept, you enlist a junior software engineer to make some quick helper functions for you. You get the helper functions back from them and notice that they’re functional, but could be implemented better. You decide to use this as a teaching moment and provide a code review for your coworker.
 
-![Dephy Exo Boot](/exoBoot.jpg)
-
 -------------------------
 
 ## Candidate Action Items:
@@ -93,3 +91,5 @@ incline                | Rough estimate of a the ground slope | % grade | Positi
 
 **Note**: The IMU is located on the armature of the ExoBoot and the ankle encoder is located at the ankle joint.
 See the ExoBoot image for details.
+
+![Dephy Exo Boot](/Part_2/exoBoot.jpg)
