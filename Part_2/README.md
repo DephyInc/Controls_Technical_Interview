@@ -37,7 +37,7 @@ You know you can’t prototype solutions for all your questions, but want to see
 
 ## Rules of Engagement
 
-0. We don't expect you to spend more than 4 hours working on this technical challenge. Do what you can in that time. If you want to work more feel free, but please push your final solution within 24 hours of receiving this task, as that is when we will pull your branch and evaluate your solution.
+0. We don't expect you to spend more than 4 hours working on this technical challenge. Do what you can in that time. If you want to work more feel free, but please push your final solution and create your pull request within 24 hours of receiving this task, as that is when we will evaluate your solution.
 1. You may implement your solution for Task 1 in either Matlab or Python.
 2. If you choose to implement in Python, you may only use the following non-standard libraries:
 	- numpy
