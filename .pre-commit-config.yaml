@@ -1,0 +1,56 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.0.1
+    hooks:
+    -   id: trailing-whitespace
+        exclude: |
+            (?x)^(
+                .*\.(ico|jpg|svg|png|user|xml|yaml|pro|pri|qrc|ui|dll|a|o|so|dll\.a|hex|mdl|slx)|
+            )$
+    -   id: end-of-file-fixer
+        exclude: |
+            (?x)^(
+                .*\.(ico|jpg|svg|png|user|xml|yaml|pro|pri|qrc|ui|dll|a|o|so|dll\.a|hex|mdl|slx)|
+            )$
+    -   id: check-yaml
+    -   id: check-added-large-files
+    -   id: check-executables-have-shebangs
+    -   id: mixed-line-ending
+    -   id: check-merge-conflict
+    -   id: check-docstring-first
+    -   id: check-case-conflict
+-   repo: https://github.com/alan-turing-institute/CleverCSV-pre-commit
+    rev: v0.7.0
+    hooks:
+    -   id: clevercsv-standardize
+-   repo: https://github.com/jumanjihouse/pre-commit-hooks
+    rev: 2.1.5
+    hooks:
+    -   id: forbid-space-in-indent
+        exclude: |
+            (?x)^(
+                .*\.(ico|jpg|svg|png|user|xml|yaml|yml|pro|pri|qrc|ui|dll|a|o|so|dll\.a|hex|mdl|slx)|
+            )$
+-   repo: https://gitlab.com/sotilrac/black-but-with-tabs-pre-commit
+    rev: v0.5
+    hooks:
+    -   id: black
+        language_version: python3
+-   repo: https://github.com/PyCQA/pylint
+    rev: v2.10.2
+    hooks:
+    -   id: pylint
+        args:
+            - --indent-string='\t'
+            - --disable=C0330, R0801
+            - --exit-zero
+        additional_dependencies:
+            - flexsea
+            - numpy
+            - matplotlib
+            - pyclibrary
+        verbose: true
+        files:  "" # No files
