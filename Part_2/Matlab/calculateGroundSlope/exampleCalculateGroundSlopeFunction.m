@@ -4,7 +4,7 @@ exampleGroundSlopePredictions = exampleCalculateGroundSlope(data_table);
 
 function exampleGroundSlopePredictions = exampleCalculateGroundSlope(data_table)
     exampleGroundSlopePredictions = zeros(size(data_table.incline));
-    
+
     figure
     plot(data_table.incline, 'b')
     hold on;

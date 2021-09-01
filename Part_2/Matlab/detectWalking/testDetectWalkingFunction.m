@@ -10,9 +10,9 @@ function testDetectWalking()
     for i = 1:size(files,1)
         filename = files(i).name;
         data_table = readtable(strcat('dataset/',filename));
-        
+
         detectWalkingPredictions = detectWalking(data_table);
-        
+
         figure
         plot(data_table.movement, 'b')
         hold on;

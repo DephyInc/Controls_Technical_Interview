@@ -5,7 +5,7 @@
 
 % Input:
 % data_table >> an N x M table of variables collected from a single user
-% while doing a single movement for multiple steps (i.e. 10 walking steps, 
+% while doing a single movement for multiple steps (i.e. 10 walking steps,
 % 10 running steps, etc).
 
 % Output:

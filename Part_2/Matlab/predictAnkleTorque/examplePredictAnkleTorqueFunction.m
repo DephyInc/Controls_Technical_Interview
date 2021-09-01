@@ -4,7 +4,7 @@ exampleAnkleTorquePredictions = examplePredictAnkleTorque(data_table);
 
 function exampleAnkleTorquePredictions = examplePredictAnkleTorque(data_table)
     exampleAnkleTorquePredictions = data_table.ank_torque;
-    
+
     figure
     plot(data_table.ank_torque, 'b')
     hold on;

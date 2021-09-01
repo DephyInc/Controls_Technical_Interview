@@ -4,7 +4,7 @@ exampleDetectWalkingPredictions = exampleDetectWalking(data_table);
 
 function exampleDetectWalkingPredictions = exampleDetectWalking(data_table)
     exampleDetectWalkingPredictions = data_table.movement;
-    
+
     figure
     plot(data_table.movement, 'b')
     hold on;

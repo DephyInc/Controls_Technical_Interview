@@ -4,7 +4,7 @@ exampleIsUserInStancePredictions = exampleIsUserInStance(data_table);
 
 function exampleIsUserInStancePredictions = exampleIsUserInStance(data_table)
     exampleIsUserInStancePredictions = max(0,data_table.gait_state);
-    
+
     figure
     plot(data_table.gait_state, 'b')
     hold on;

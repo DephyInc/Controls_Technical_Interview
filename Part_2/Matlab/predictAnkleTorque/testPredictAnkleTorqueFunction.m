@@ -10,9 +10,9 @@ function testPredictAnkleTorque()
     for i = 1:size(files,1)
         filename = files(i).name;
         data_table = readtable(strcat('dataset/',filename));
-        
+
         ankleTorquePredictions = predictAnkleTorque(data_table);
-        
+
         figure
         plot(data_table.ank_torque, 'b')
         hold on;
