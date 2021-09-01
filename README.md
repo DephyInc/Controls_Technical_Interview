@@ -11,7 +11,7 @@ git clone git@github.com:DephyInc/Controls_Technical_Interview.git
 git checkout -b solution/FIRSTNAME_LASTNAME  # e.g. solution/luke_mooney
 ```
 Once you are ready to submit your solution, create a pull request to _master_.
-(Note: You will not have infinite time to submit your solution, but you should have your deadline 
+(Note: You will not have infinite time to submit your solution, but you should have your deadline
 info in an email from us)
 
 Depending on which part of the process you're in (you should have this info in an email from us),

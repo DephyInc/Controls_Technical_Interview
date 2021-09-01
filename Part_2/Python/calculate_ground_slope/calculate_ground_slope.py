@@ -15,11 +15,9 @@ represents the % grade of the ground the user is currently moving over
 data_array[n,hf.variable_name_to_column_index('incline')],
 though hopefully your prediction is much better than ours)
 """
-#!/usr/bin/env python
-
 
 from copy import deepcopy
-from .. import helper_functions as hf
+import helper_functions as hf  # pylint: disable=import-error
 
 
 def calculate_ground_slope(data_array):

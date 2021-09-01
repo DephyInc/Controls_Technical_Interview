@@ -1,12 +1,18 @@
 #!/usr/bin/env python
+"""Example script"""
+import os
+import sys
 import numpy as np
 import matplotlib.pyplot as mplt
-from .. import helper_functions as hf
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+import helper_functions as hf  # pylint: disable=wrong-import-position disable=import-error
 
 np.warnings.filterwarnings("ignore", category=np.VisibleDeprecationWarning)
 
 
 def example_calculate_ground_slope(data_array):
+	"""Run example function"""
 	example_ground_slope_predictions = np.zeros(np.size(data_array, 0))
 
 	return example_ground_slope_predictions

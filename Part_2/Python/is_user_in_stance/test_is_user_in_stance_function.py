@@ -1,8 +1,13 @@
 #!/usr/bin/env python
+"""Test script"""
 import os
+import sys
 import matplotlib.pyplot as mplt
-from . import is_user_in_stance as iuis
-from .. import helper_functions as hf
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+# pylint: disable=wrong-import-position disable=import-error
+import is_user_in_stance as iuis
+import helper_functions as hf
 
 
 def test_is_user_in_stance():

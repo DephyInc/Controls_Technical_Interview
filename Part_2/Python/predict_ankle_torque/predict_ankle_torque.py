@@ -16,9 +16,8 @@ represents how much ankle torque the user would like to receive at this point in
 (i.e. this function should predict the value of the column in data_array representing ankle torque)
 """
 
-#!/usr/bin/env python
 from copy import deepcopy
-from .. import helper_functions as hf
+import helper_functions as hf  # pylint: disable=import-error
 
 
 def predict_ankle_torque(data_array):

@@ -1,13 +1,21 @@
 #!/usr/bin/env python
+"""Example script"""
+import os
+import sys
 from copy import deepcopy
+
+# pylint: disable=import-error
 import numpy as np
 import matplotlib.pyplot as mplt
-from .. import helper_functions as hf
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+import helper_functions as hf  # pylint: disable=wrong-import-position
 
 np.warnings.filterwarnings("ignore", category=np.VisibleDeprecationWarning)
 
 
 def example_detect_walking(data_array):
+	"""Run example function"""
 	example_detect_walking_predictions = deepcopy(
 		data_array[:, hf.variable_name_to_column_index("movement")]
 	)
