@@ -114,7 +114,7 @@ end
 % returns the column index of the given variable name in a data_array, 
 % assuming the data array is in the same general format/order as the data in the csv logs 
 function variable_index = variable_name_to_column_index(variable_name)
-	possible_variables = {'state_time','accelx','accely','accelz','gyrox','gyroy','gyroz','mot_ang','mot_vel','mot_acc','mot_cur','mot_volt','batt_volt','batt_curr','temperature','status_mn','status_ex','status_re','genvar_0','genvar_1','genvar_2','genvar_3','genvar_4','genvar_5','genvar_6','genvar_7','genvar_8','genvar_9','genvar_10','genvar_11','genvar_12','genvar_13','genvar_14','ank_ang','ank_vel','ank_torque','peak_ank_torque','step_energy','step_count','step_time','gait_state','movement','speed','incline','sys_time','event flags'};
+	possible_variables = {'state_time','accelx','accely','accelz','gyrox','gyroy','gyroz','mot_ang','mot_vel','mot_acc','mot_cur','mot_volt','batt_volt','batt_curr','temperature','status_mn','status_ex','status_re','ank_ang','ank_vel','ank_torque','peak_ank_torque','step_energy','step_count','step_time','gait_state','movement','speed','incline','sys_time','event flags'};
 
 	variable_index = -1;
 
