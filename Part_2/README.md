@@ -75,7 +75,7 @@ You know you can’t prototype solutions for all your questions, but want to see
 
 The datasets provided are different for each problem and include a variety of files that correspond to different users completing different movements, such as walking, running, going upstairs, and going downstairs. Each csv in the dataset, sampled at 100 Hz,  lists a variety of variables, including but not limited to:
 
-Variable name          | Description           | Units | Notes
+Name          | Description           | Units | Notes
 -----------------------|-----------------------|-------|-------------------
 accelx, accely, accelz | acceleration from IMU | bits  | 2048 bits/(m/s^2)
 gyrox, gyroy, gyroz    | angular velocity from IMU | bits | 32.768 bits/(deg/s)
