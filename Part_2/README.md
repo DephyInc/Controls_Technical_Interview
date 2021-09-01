@@ -28,11 +28,11 @@ You know you can’t prototype solutions for all your questions, but want to see
 3. Please fill out the following:
 
 	- Did you implement Task 1 in Matlab or Python?
-		- >YOUR ANSWER HERE
+		- >ADD YOUR ANSWER HERE
 	- Which function did you choose to implement for Task 1?
-		- >YOUR ANSWER HERE
+		- >ADD YOUR ANSWER HERE
 	- Briefly describe your implementation (1-3 sentences).
-		- >YOUR ANSWER HERE
+		- >ADD YOUR ANSWER HERE
 	- Briefly describe your improvements to the file of helper functions.
 
 -------------------------
@@ -49,14 +49,11 @@ You know you can’t prototype solutions for all your questions, but want to see
 	- if necessary you can use simple standard libaries like (os, sys, math, copy, etc)
 3. If you choose to implement in Matlab, DO NOT use any functions from non-standard toolboxes or add-ons.
 4. Which function you choose to implement will dictate which folder of the repo you work in. However, each folder contains the following files/folders:
-	- dataset: a folder containing csv files of data collected from people using the exo. You can
-	  use this folder to make/self-test your implementaion. Note: The dataset we use to evaluate
-	  your implementation may contain a few additional files that you do not have access too.
+	- dataset: a folder containing csv files of data collected from people using the exo. You can use this folder to make/self-test your implementaion. Note: The dataset we use to evaluate your implementation may contain a few additional files that you do not have access too.
 	- functionName: this is the file where you will implement your function
 	- exampleFunctionNameFunction: provides an example of what the output of your function
 	  implementation may look like
-	- testFunctionNameFunction: provides a way for you to test your function implementation on the
-			 files in the dataset folder
+	- testFunctionNameFunction: provides a way for you to test your function implementation on the files in the dataset folder
 5. If you create additional code to help you analyze data or otherwise help you implement your function, put them in 1 or more additional files within the function's folder. Don't forget; we are interested in both your solution and your thought process.
 
 -------------------------
@@ -78,10 +75,7 @@ You know you can’t prototype solutions for all your questions, but want to see
 
 ## A Few More Useful Details
 
-The datasets provided are different for each problem and include a variety of files that correspond to
-different users completing different movements, such as walking, running, going upstairs, and going
-downstairs. Each csv in the dataset, sampled at 100 Hz,  lists a variety of variables, including but
-not limited to:
+The datasets provided are different for each problem and include a variety of files that correspond to different users completing different movements, such as walking, running, going upstairs, and going downstairs. Each csv in the dataset, sampled at 100 Hz,  lists a variety of variables, including but not limited to:
 
 Variable name          | Description           | Units | Notes
 -----------------------|-----------------------|-------|-------------------
