@@ -26,13 +26,13 @@ You know you can’t prototype solutions for all your questions, but want to see
 3. Please fill out the following:
 
 	- Did you implement Task 1 in Matlab or Python?
-		- >ADD YOUR ANSWER HERE
+		- Matlab
 	- Which function did you choose to implement for Task 1?
-		- >ADD YOUR ANSWER HERE
+		- isUserInStance
 	- Briefly describe your implementation (1-3 sentences).
-		- >ADD YOUR ANSWER HERE
+		- The function iterates through the data in a "real-time" comparable manner and locates a step taking into account the magnitude of change in acceleration of the boot in the x/y plane in addition to the rotation of the ankle. The end of a step (or lift-off portion) is then detected using the change in velocity of the ankle to determine that the foot has completed a push-off. The timing between these events is used for further verification and filtering in determining the next events in the repeated loop.
 	- Briefly describe your improvements to the file of helper functions.
-
+        - My improvements are to the plotting to provide clarity for future users on what is being demonstrated by the examples. I did not realize until this step that these functions could be used in Task 1 and assumed this work was meant to be done from scratch (which ate up a lot of time).
 -------------------------
 
 ## Rules of Engagement

@@ -1,17 +1,31 @@
 %% Run the file for an example of how to use the helper functions
 % If you want to actually use these functions within your function
 % implementation, just copy and paste the function into your file
+close all;
+
 data_table = load_csv_file('detectWalking/dataset/rachel_walking_3mph_left.csv');
+
 figure
-plot(data_table.ank_ang)
+plot((data_table.state_time - data_table.state_time(1))/1000, ... 
+     data_table.ank_ang, 'linewidth', 3);
+title('Delphy Inc - ExoBoot: Ankle Angle over Time');
+xlabel('Time (s)');
+ylabel('Angle');
 
 steps = get_step_cycle_data_from_data_table(data_table);
 average_step = get_average_step(steps);
+
 figure
-plot(average_step.ank_ang);
+plot(average_step.ank_ang, 'linewidth', 3);
+title('Delphy Inc - ExoBoot: Average Ankle Angle of a Step');
+xlabel('Data Point (taken @100 Hz)');
+ylabel('Angle');
 
 figure
 plot_variable_by_step(data_table,'ank_ang');
+title('Delphy Inc - ExoBoot: Overlay of Ankle Angle for Cyclic Steps');
+xlabel('Data Point (taken @100 Hz)');
+ylabel('Angle');
 
 ank_ang_index = variable_name_to_column_index('ank_ang');
 
