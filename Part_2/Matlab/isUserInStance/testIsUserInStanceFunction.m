@@ -17,5 +17,8 @@ function testIsUserInStance()
         plot(data_table.gait_state, 'b')
         hold on;
         plot(isUserInStancePredictions,'r')
+        
+%         figure;
+%         plot(isUserInStancePredictions.*data_table.ank_ang)
     end
 end
