@@ -10,15 +10,14 @@ function testIsUserInStance()
     for i = 1:size(files,1)
         filename = files(i).name;
         data_table = readtable(strcat('dataset/',filename));
-
+        
+        disp(filename)
         isUserInStancePredictions = isUserInStance(data_table);
 
-        figure
+        figure;
         plot(data_table.gait_state, 'b')
+        title(regexprep(filename, '_', ' '));
         hold on;
         plot(isUserInStancePredictions,'r')
-        
-%         figure;
-%         plot(isUserInStancePredictions.*data_table.ank_ang)
     end
 end

@@ -25,7 +25,7 @@ function isUserInStancePredictions = isUserInStance(data_table)
     
     % vectors
     time = data_table.state_time;
-    jointAngle = data_table.ank_ang;
+    jointAngle = data_table.ank_ang - data_table.ank_ang(1);
     jointVelocity = data_table.ank_vel;
     jointTorque = data_table.ank_torque;
     inStance = []; % preallocation would add to speed but we are building this vector in "real time"
@@ -37,45 +37,51 @@ function isUserInStancePredictions = isUserInStance(data_table)
     currentState = LATESTANCE;
     
     % Thresholds
-    velocityHeelStrikeThreshold = 1000;
-    anglePushOffThreshold = 1000;  
+    velocityHeelStrikeThreshold = 500;
+    accelHeelStrikeThreshold = 80;
+    velocityPushOffThreshold = 500;
+    anglePushOffThreshold = 1000;      
+    
+    % debug
+    exPred = max(0,data_table.gait_state);
     
     % "time loop"
+    jointVelocityPrev = 0;
+    jointVelocityNow = 0;
+    filt = .9;
     for i = 1:nPts
         jointAngleNow = jointAngle(i);
-        jointVelocityNow = jointVelocity(i);
+        jointVelocityNow = (1-filt)*jointVelocityNow + (filt)*jointVelocity(i);
+        jointAccel = (jointVelocityNow - jointVelocityPrev)/10;
+        jointVelocityPrev = jointVelocityNow;
         jointTorqueNow = jointTorque(i);
         
-        if currentState == SWING
-            % Add to 0 inStance vector
-            inStance = [inStance; 0];
-            
+        inStance = [inStance; (currentState ~= SWING)];
+        
+        % Debug
+        
+        if (inStance(end) ~= exPred(i))
+            disp([currentState inStance(end) exPred(i) jointAngleNow jointVelocityNow]);
+        end
+        
+        if currentState == SWING       
             % Check if we have transistioned to early stance
-            if (jointVelocityNow > velocityHeelStrikeThreshold) && (jointAngleNow > 0)
+            if (jointVelocityNow > velocityHeelStrikeThreshold) && (jointAccel > accelHeelStrikeThreshold) %&& (jointAngleNow > 0)
                 currentState = EARLYSTANCE;
             end
         elseif currentState == EARLYSTANCE
-            % Add to 1 inStance vector
-            inStance = [inStance; 1];
-            
             % Check if we have transistioned to midstance
             if (jointVelocityNow < 0)
                 currentState = MIDSTANCE;
             end
         elseif currentState == MIDSTANCE
-            % Add to 1 inStance vector
-            inStance = [inStance; 1];
-            
             % Check if we have transistioned to midstance
-            if (jointVelocityNow > 0)
+            if (jointVelocityNow > velocityPushOffThreshold)
                 currentState = LATESTANCE;
             end
         elseif currentState == LATESTANCE
-            % Add to 1 inStance vector
-            inStance = [inStance; 1];
-            
             % Check if we have transistioned to midstance
-            if (jointVelocityNow < 0)  && (jointAngleNow > anglePushOffThreshold)
+            if (jointVelocityNow < velocityPushOffThreshold)  && (jointAngleNow > anglePushOffThreshold)
                 currentState = SWING;
             end
         end

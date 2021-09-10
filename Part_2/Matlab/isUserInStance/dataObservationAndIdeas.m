@@ -4,7 +4,9 @@
 
 clear; close all; clc;
 % data_table = readtable('dataset/chenlu_walking_2mph_left.csv');
-data_table = readtable('dataset/rachel_running_6mph_left.csv');
+data_table = readtable('dataset/nick_walking_4mph_left.csv');
+% data_table = readtable('dataset/rachel_running_6mph_left.csv');
+% data_table = readtable('dataset/rachel_walking_3mph_left.csv');
 
 %% goal
 inStance = data_table.gait_state;
@@ -13,11 +15,11 @@ inStance = data_table.gait_state;
 time = data_table.state_time - data_table.state_time(1);
 
 %% ankle
-jointAngle = data_table.ank_ang; % angle measured in counts
+jointAngle = data_table.ank_ang - data_table.ank_ang(1); % angle measured in counts
 jointVelocity = data_table.ank_vel;
 jointTorque = data_table.ank_torque;
-normAnkleData = normalize([jointAngle, jointVelocity, jointTorque, inStance]);
-fp(time, normAnkleData);
+ankleData = ([jointAngle/max(jointAngle), jointVelocity/max(jointVelocity), jointTorque/max(jointTorque), inStance]);
+fp(time, ankleData);
 
 % from this data we find that the stance phase starts at heel strike
 % signified by the ankle velocity reaching above a threshold during swing.
@@ -41,7 +43,12 @@ fp(time, normAnkleData);
 
 %% ankle acceleration
 jointAccel = (jointVelocity - [0; jointVelocity(1:end-1)])/10;
-fp(jointAccel)
+fp([jointAngle, jointVelocity, jointAccel*10])
+
+% filter
+Wn = 10/(100/2);
+[b,a] = butter(1, Wn,'high');
+fp(time, [jointAngle/max(jointAngle), jointVelocity/max(jointVelocity), filter(b,a,jointAccel/max(jointAccel))])
 
 % We could also use joint acceleration to predict the rapid plantarflexion
 % that acompanies heelstrike. Although there is a high plantarflexion
@@ -55,7 +62,9 @@ fp(time,[jointAccel jointAccel.*inStance], 'Accel');
 
 % these only work for specific tests. slower speeds or running can screw
 % with this prediction. we need to try to detect early and mid stance as
-% well.
+% well. The other issue (that I am realizing way too late) is that the zero point for the ankle angle is not
+% consistent between users or gaits so I can't use positive / negative
+% ankle angle to determine phase of gait.
 
 %% IMU
 accel = [data_table.accelx, data_table.accely, data_table.accelz];
@@ -68,73 +77,23 @@ accely = data_table.accely;
 fp(time,[accely accely.*inStance], 'Accel Y');
 fp(time,normalize([accely accely.*inStance jointVelocity]), 'Accel Y and Velo');
 
-%% Works for some speeds:
-    % proto enum
-SWING = 0;
-EARLYSTANCE = 1;
-MIDSTANCE = 2;
-LATESTANCE = 3;
+accelSag = sqrt(data_table.accely.^2 + data_table.accelz.^2);
+fp(time, [accelSag accelSag.*inStance], 'Accel Sagittal')
 
-% vectors
-time = data_table.state_time;
-jointAngle = data_table.ank_ang;
-jointVelocity = data_table.ank_vel;
-inStance = []; % preallocation would add to speed but we are building this vector in "real time"
+% filter
+Wn = 20/(100/2);
+[b,a] = butter(1, Wn,'low');
+fp(time, [accely, filter(b,a,accely)])
 
-% number of time points
-nPts = length(time);
+%% testing implementation
+isUserInStancePredictions = isUserInStance(data_table);
+fp(time, [data_table.gait_state isUserInStancePredictions], 'compare to gait state');
+fp(time, [jointAngle jointAngle.*isUserInStancePredictions jointAngle.*inStance], 'joint angle prediction');
+fp(time, [jointVelocity jointVelocity.*isUserInStancePredictions jointVelocity.*inStance], 'joint velocity prediction');
+fp(time, normalize([jointAngle, jointVelocity, max(inStance,0), isUserInStancePredictions]));
+% I need to take into acount ground slope for this to work.
 
-% initial state estimation
-currentState = LATESTANCE;
-
-% Thresholds
-velocityHeelStrikeThreshold = 2000;
-anglePushOffThreshold = 5200;  
-
-% "time loop"
-for i = 1:nPts
-    jointAngleNow = jointAngle(i);
-    jointVelocityNow = jointVelocity(i);
-
-    if currentState == SWING
-        % Add to 0 inStance vector
-        inStance = [inStance; 0];
-
-        % Check if we have transistioned to early stance
-        if jointVelocityNow > velocityHeelStrikeThreshold
-            currentState = EARLYSTANCE;
-        end
-    elseif currentState == EARLYSTANCE
-        % Add to 1 inStance vector
-        inStance = [inStance; 1];
-
-        % Check if we have transistioned to midstance
-        if (jointVelocityNow < 0)
-            currentState = MIDSTANCE;
-        end
-    elseif currentState == MIDSTANCE
-        % Add to 1 inStance vector
-        inStance = [inStance; 1];
-
-        % Check if we have transistioned to midstance
-        if (jointVelocityNow > 0)
-            currentState = LATESTANCE;
-        end
-    elseif currentState == LATESTANCE
-        % Add to 1 inStance vector
-        inStance = [inStance; 1];
-
-        % Check if we have transistioned to midstance
-        if (jointVelocityNow < 0)
-            currentState = SWING;
-        end
-    end
-end
-
-isUserInStancePredictions = inStance;
-
-
-%%
+%% helper function
 function [p,x] = fp(varargin)
 % creates figure and plots current variable with title.
 
