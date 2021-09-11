@@ -32,13 +32,14 @@ You know you can’t prototype solutions for all your questions, but want to see
 		- >isUserInStance
 
 	- Briefly describe your implementation (1-3 sentences).
-		- >As a proof of concept prototype, I used some simple if/then statements to determine when the foot was in contact with the ground. This particular implementation mostly relies on the join encoder to determine when there are high velocities during dorsiflexion or plantarflexion. With a good prediction of ankle torque, the function works decently but some further imrpovements will be needed to make the cheks more robust.
+		- >As a proof of concept prototype, I used some simple if/then statements to determine when the foot was in contact with the ground. This particular implementation mostly relies on the join encoder to determine when there are high velocities and accelerations during heelstrike and a tow point with a negative velocity during push-off. With a good prediction of ankle torque, the function works decently but some further improvements will be needed to make the checks more robust.
 
 	- Briefly describe your improvements to the file of helper functions.
 		add titles to plots to keep track of them
 		load_csv_file: this function isn't necessary as it doesn't do anything more than the readtable function it calls. However
 		getHSindices: removed function definition inside function. DetectPosZC is not used outside of getHSindices and redefining it every time the function is called slows down computation.
 		get_step_cycle_data_from_data_table: define num_steps=size(HS,1)-1 so that it can be used multiple times.
+		plot_variable_by_step: reuse get_step_cycle_data_from_data_table since it uses the exact same code.
 		get_average_step: preallocate space, reduce number of nested loops, avoid using the same name for variables of different type. We may want to alter the code in the future to record the number of steps being summed at each time point to account for the drop off of shorter steps.
 		variable_name_to_column_index: input the data_table as well so that you don't have to guess at the array names and use single line of built in search functions.
 

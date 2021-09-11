@@ -1,4 +1,6 @@
-% Looking at data to decide strategy
+% This file contains my notes and some stream of concious work to try and
+% understand the data provided and how best to manipulate it.
+
 % Initial Thoughts, ankle velocity mixed with predicted torque will likely
 % give us the information we need. may need to use the IMU but may not.
 
@@ -43,7 +45,7 @@ fp(time, ankleData);
 
 %% ankle acceleration
 jointAccel = (jointVelocity - [0; jointVelocity(1:end-1)])/10;
-fp([jointAngle, jointVelocity, jointAccel*10])
+fp(time, [jointAngle, jointVelocity, jointAccel*10], 'Raw joint data')
 
 % filter
 Wn = 10/(100/2);
@@ -93,7 +95,7 @@ fp(time, [jointVelocity jointVelocity.*isUserInStancePredictions jointVelocity.*
 fp(time, normalize([jointAngle, jointVelocity, max(inStance,0), isUserInStancePredictions]));
 % I need to take into acount ground slope for this to work.
 
-%% helper function
+%% helper function for rapid plotting
 function [p,x] = fp(varargin)
 % creates figure and plots current variable with title.
 

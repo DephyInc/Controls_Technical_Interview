@@ -15,9 +15,12 @@
 
 function isUserInStancePredictions = isUserInStance(data_table)
     % This code will run a loop through the dataset to simulate real time
-    % data flowing in.
+    % data flowing in. Current iteration works well for running and
+    % consitent gait but will require some tuning to make it more robust.
+    % This includes a much better estimate of the foot neutral position to
+    % help determine when the foot is plantar or dorsiflexed.
     
-    % proto enum
+    % prototype enum
     SWING = 0;
     EARLYSTANCE = 1;
     MIDSTANCE = 2;
@@ -25,7 +28,7 @@ function isUserInStancePredictions = isUserInStance(data_table)
     
     % vectors
     time = data_table.state_time;
-    jointAngle = data_table.ank_ang - data_table.ank_ang(1);
+    jointAngle = data_table.ank_ang - data_table.ank_ang(1); % and attempt at zeroing the ankle angle
     jointVelocity = data_table.ank_vel;
     jointTorque = data_table.ank_torque;
     inStance = []; % preallocation would add to speed but we are building this vector in "real time"
@@ -39,11 +42,11 @@ function isUserInStancePredictions = isUserInStance(data_table)
     % Thresholds
     velocityHeelStrikeThreshold = 500;
     accelHeelStrikeThreshold = 80;
-    velocityPushOffThreshold = 500;
+    velocityPushOffThreshold = 400;
     anglePushOffThreshold = 1000;      
     
     % debug
-    exPred = max(0,data_table.gait_state);
+    % exPred = max(0,data_table.gait_state);
     
     % "time loop"
     jointVelocityPrev = 0;
@@ -51,7 +54,7 @@ function isUserInStancePredictions = isUserInStance(data_table)
     filt = .9;
     for i = 1:nPts
         jointAngleNow = jointAngle(i);
-        jointVelocityNow = (1-filt)*jointVelocityNow + (filt)*jointVelocity(i);
+        jointVelocityNow = (1-filt)*jointVelocityNow + (filt)*jointVelocity(i); %small filter added to velocity to improve prediction
         jointAccel = (jointVelocityNow - jointVelocityPrev)/10;
         jointVelocityPrev = jointVelocityNow;
         jointTorqueNow = jointTorque(i);
@@ -59,10 +62,9 @@ function isUserInStancePredictions = isUserInStance(data_table)
         inStance = [inStance; (currentState ~= SWING)];
         
         % Debug
-        
-        if (inStance(end) ~= exPred(i))
-            disp([currentState inStance(end) exPred(i) jointAngleNow jointVelocityNow]);
-        end
+        % if (inStance(end) ~= exPred(i))
+        %     disp([currentState inStance(end) exPred(i) jointAngleNow jointVelocityNow]);
+        % end
         
         if currentState == SWING       
             % Check if we have transistioned to early stance
@@ -75,12 +77,12 @@ function isUserInStancePredictions = isUserInStance(data_table)
                 currentState = MIDSTANCE;
             end
         elseif currentState == MIDSTANCE
-            % Check if we have transistioned to midstance
+            % Check if we have transistioned to latestance
             if (jointVelocityNow > velocityPushOffThreshold)
                 currentState = LATESTANCE;
             end
         elseif currentState == LATESTANCE
-            % Check if we have transistioned to midstance
+            % Check if we have transistioned to swing
             if (jointVelocityNow < velocityPushOffThreshold)  && (jointAngleNow > anglePushOffThreshold)
                 currentState = SWING;
             end

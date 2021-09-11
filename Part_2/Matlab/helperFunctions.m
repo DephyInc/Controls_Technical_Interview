@@ -2,19 +2,19 @@
 % If you want to actually use these functions within your function
 % implementation, just copy and paste the function into your file
 data_table = readtable('detectWalking/dataset/rachel_walking_3mph_left.csv');
-figure
-plot(data_table.ank_ang)
+figure;
+plot(data_table.ank_ang);
 title('Ankle Angle');
 
 steps = get_step_cycle_data_from_data_table(data_table);
 average_step = get_average_step(steps);
-figure
+figure;
 plot(average_step.ank_ang);
 title('Average Ankle Angle');
 
-figure
+figure;
 plot_variable_by_step(data_table,'ank_ang');
-title('Ankle Angle Per Step')
+title('Ankle Angle Per Step');
 
 ank_ang_index = variable_name_to_column_index(data_table,'ank_ang');
 
@@ -46,7 +46,8 @@ end
 % variable name (e.g. data_table.step_time)
 function average_step = get_average_step(steps)
     
-
+    % determine the longest step for use in the summation and store lengths
+    % of steps in the j vector.
     I = 0;
     num_steps = size(steps,1);
     j = zeros(num_steps,1);
@@ -77,14 +78,7 @@ end
 % you is somewhat periodic. this function allows you to break the data down
 % and plot each individual period)
 function plot_variable_by_step(data_table,variable)
-    HS = getHSindices(data_table);
-
-    steps = cell((size(HS,1)-1),1);
-
-    for k = 1:(size(HS,1)-1)
-        cycle = data_table(HS(k):HS(k+1),:);
-        steps{k,1} = cycle;
-    end
+    steps = get_step_cycle_data_from_data_table(data_table);
 
     for k = 1:(size(steps,1))
         plot(steps{k}{:,variable})
