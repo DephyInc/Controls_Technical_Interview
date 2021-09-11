@@ -82,10 +82,75 @@ fp(time,normalize([accely accely.*inStance jointVelocity]), 'Accel Y and Velo');
 accelSag = sqrt(data_table.accely.^2 + data_table.accelz.^2);
 fp(time, [accelSag accelSag.*inStance], 'Accel Sagittal')
 
+
+%% filtered signals
+accelx = data_table.accelx;
+accely = data_table.accely;
+accelz = data_table.accelz;
+gyrox = data_table.gyrox;
+gyroy = data_table.gyroy;
+gyroz = data_table.gyroz;
+
 % filter
-Wn = 20/(100/2);
+accelbits = 2048;
+gyrobits = 32.768;
+Wn = 10/(100/2);
 [b,a] = butter(1, Wn,'low');
-fp(time, [accely, filter(b,a,accely)])
+
+% accel
+faccelx = filter(b,a,accelx)/accelbits;
+faccely = filter(b,a,accely)/accelbits;
+faccelz = filter(b,a,accelz)/accelbits;
+fgyrox = filter(b,a,gyrox)/gyrobits;
+fgyroy = filter(b,a,gyroy)/gyrobits;
+fgyroz = filter(b,a,gyroz)/gyrobits;
+timeS = time/1000;
+
+% orientation with drift
+thetax = cumtrapz(timeS,fgyrox);
+thetay = cumtrapz(timeS,fgyroy);
+thetaz = cumtrapz(timeS,fgyroz);
+
+fp(time, [fgyrox, fgyroy, fgyroz, inStance*100], 'angular velocity')
+fp(time, [thetax, thetay, thetaz, inStance*100], 'orientation with drift')
+
+% Velocities with drift
+velx = cumtrapz(timeS,faccelx);
+vely = cumtrapz(timeS,faccely);
+velz = cumtrapz(timeS,faccelz);
+
+fp(time, [faccelx, velx], 'x direction')
+fp(time, [faccelx, faccely, faccelz, inStance], 'accelerations')
+fp(time, [velx, vely, velz], 'velocities with drift')
+
+% With access to additional 3rd party libraries I could add in quaternion
+% calculations and a basic madgwick filter to reorient the IMU and remove
+% the effects of gravity. without this filter, I could still try to find
+% the orienation in the gyro but I think drift would hurt the estimate too
+% much.
+
+jerkx = (faccelx - [0; faccelx(1:end-1)]) / .01;
+jerky = (faccely - [0; faccely(1:end-1)]) / .01;
+jerkz = (faccelz - [0; faccelz(1:end-1)]) / .01;
+jerk = sqrt(jerkx.^2 + jerky.^2 + jerkz.^2);
+fp(time, [jerk, jerkx, jerky, jerkz, inStance*50], 'jerk')
+
+Wn = 40/(100/2);
+[b,a] = butter(1, Wn,'High');
+fjerkx = filter(b,a,jerkx);
+fjerky = filter(b,a,jerky);
+fjerkz = filter(b,a,jerkz);
+fjerk = filter(b,a,jerk);
+fp(time, [fjerk, fjerkx, fjerky, fjerkz, inStance*10], 'jerk')
+
+% high jerk in the IMU seems to imply collision with the ground. may be the
+% best way to determine first collision.
+
+% I am not sure how useful the IMU will be for the current code. most of
+% the issues involve errors in detecting lift off. Too sensitive and it
+% predicts lift off much too early, to insensitive and it never goes to
+% swing. The other issue seems to be that it doesn't predict mid stance
+% well enough.
 
 %% testing implementation
 isUserInStancePredictions = isUserInStance(data_table);
