@@ -1,0 +1,33 @@
+BRAINSTORMING
+- Predict Torque
+	- Use phase variable approach from Goldfarb, use existing data and linear regression to make torque profile
+	- Use encoder to detect foot flat and inflection point after foot flat
+- Predict Stance
+	- Use Jerk along shank axis to predict transitions between stance and swing
+	- Use when IMU x acceleration is roughly equal to tangential acceleration from ankle angle
+- Predict walking
+	- If |accel| is roughly equal to gravity for longer than half a second, assume standing
+
+
+
+PLAN FOR TORQUE PREDICTION
+1. Create a phase variable from Ankle Angle and either integrated ankle angle
+   or angle velocity (will test both to see if they end up being viable) as
+   in Goldfarb paper (cite later)
+    - Ankle angle did not work for phase variable. Does not monotonically increase. Let's attempt with 
+2. perform a polynomial regression on given dataset to create a polynomial 
+   function that maps phase variable progression to ankle torque
+3. Hard code the values into a predictAnkleTorque function
+
+MODIFIED PLAN OF ACTION
+1. Ankle angle did not work for phase variable. Shank angle might, but before we go too crazy, let's knock out an easy one and predict walking
+
+EASY ONE
+1. use magnitude acceleration to classify whether user is walking. quick and dirty, not best work but enough to get by in case Torque crashes and burns
+
+REVISED PLAN FOR TORQUE PREDICTION
+1. create a kalman filter to predict shank angle (just a rotational kalman filter, use gyro to propagate, accelerometer to correct)
+	- turns out just integrating GyroZ does a good enough job for our purposes
+2. use shank angle as a phase variable in place of ankle angle
+	- this is working
+3. see plan A

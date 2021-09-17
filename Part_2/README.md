@@ -26,13 +26,13 @@ You know you can’t prototype solutions for all your questions, but want to see
 3. Please fill out the following:
 
 	- Did you implement Task 1 in Matlab or Python?
-		- >ADD YOUR ANSWER HERE
+		- > Matlab
 	- Which function did you choose to implement for Task 1?
-		- >ADD YOUR ANSWER HERE
+		- > predictAnkleTorque
 	- Briefly describe your implementation (1-3 sentences).
-		- >ADD YOUR ANSWER HERE
+		- > I created a phase variable (see "A Phase Variable Approach for IMU-Based Locomotion Activity Recognition" for my inspiration) to make torque a function of gait cycle progress instead of time. Unlike the paper, I used shank angle instead of thigh angle (calculated from integrating gyroz, could use kalman filter for more stability). I then used regression to create a function from phase to the dataset torque profile. 
 	- Briefly describe your improvements to the file of helper functions.
-
+		- > The average step function did not account for different step timings and produced some funny results. I used linear interpolation to synchronize all the step timings then averaged them. I also labeled all of the plots. Finally I made sure that each step did not include the next step's heel strike.
 -------------------------
 
 ## Rules of Engagement

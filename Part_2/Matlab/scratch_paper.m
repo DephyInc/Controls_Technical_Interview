@@ -4,19 +4,16 @@
 data_table = load_csv_file('detectWalking/dataset/rachel_walking_3mph_left.csv');
 figure
 plot(data_table.ank_ang)
-%added labels
-xlabel('samples')
-ylabel('ankle angle (100xdeg)')
 
 steps = get_step_cycle_data_from_data_table(data_table);
 average_step = get_average_step(steps);
 figure
-plot(linspace(1,100,size(average_step,1)),average_step.ank_ang);
-xlabel('percent of gait cycle')
-ylabel('ankle angle (100xdeg)')
+plot(average_step.ank_ang);
 
 figure
-plot_variable_by_step(data_table,'ank_ang');
+plot_variable_by_step(data_table,'gait_state');
+figure
+plot_jerk_by_step(data_table);
 
 ank_ang_index = variable_name_to_column_index('ank_ang');
 
@@ -27,7 +24,6 @@ ank_ang_index = variable_name_to_column_index('ank_ang');
 % N = number of samples
 % M = number of variables
 function data_table = load_csv_file(file_path)
-    %one line function, not really much to change
     data_table = readtable(file_path);
 end
 
@@ -42,17 +38,11 @@ end
 % M = number of variables
 function steps = get_step_cycle_data_from_data_table(data_table)
     HS = getHSindices(data_table);
-    %plots heel strikes inclusively; doesn't plot transition from stand to
-    %walking, or walking to stand
+
     steps = cell((size(HS,1)-1),1);
 
     for k = 1:(size(HS,1)-1)
-        %double counts beginning and end of each step. could be desirable
-        %but i'll get rid of the beginning of the next phase for clarity
-        %OLD
-        %cycle = data_table(HS(k):HS(k+1),:);
-        %NEW
-        cycle = data_table(HS(k):HS(k+1)-1,:);
+        cycle = data_table(HS(k):HS(k+1),:);
         steps{k,1} = cycle;
     end
 end
@@ -78,33 +68,12 @@ function average_step = get_average_step(steps)
     for m = 1:size(steps{1},2) %iterates across variables
         data = zeros(I,1);
         for k = 1:(size(steps,1)) %iterates across steps
-              %original doesn't account for shorter steps; averaged along time instead of phase 
-%             for j = 1:size(steps{k},1) 
-%                 data(j,1) = data(j,1) + steps{k}{j,m};
-%             end
-
-              %expand every vector to size I using linear interpolation, so
-              %we average across gait phase instead of time
-              if(size(steps{k},1) < I)
-                  old_space = linspace(1,100,size(steps{k},1));
-                  new_space = linspace(1,100,I);
-                  interpolated_step = interp1(old_space,steps{k}{:,m},new_space,'spline')';
-              else
-                  interpolated_step = steps{k}{:,m};
-              end
-              data(:,1) = data(:,1) + interpolated_step;
+            for j = 1:size(steps{k},1) %doesn't account for shorter steps; averaged along time instead of phase 
+                data(j,1) = data(j,1) + steps{k}{j,m};
+            end
         end
         data = data/(size(steps,1));
-        %protect gait state and movement from not making sense
-        if(strcmp(steps{1}.Properties.VariableNames{m},'gait_state') || ...
-                strcmp(steps{1}.Properties.VariableNames{m},'movement'))
-            data = round(data);
-        end
         average_step(:,m) = data;
-        
-        %not adjusting state time since it doesn't really make sense as a
-        %variable for the average step, without just making it the same as
-        %step time; same for step count
     end
 
     average_step = array2table(average_step,'VariableNames',variableNames);
@@ -117,7 +86,6 @@ function plot_variable_by_step(data_table,variable)
     HS = getHSindices(data_table);
 
     steps = cell((size(HS,1)-1),1);
-    
 
     for k = 1:(size(HS,1)-1)
         cycle = data_table(HS(k):HS(k+1),:);
@@ -128,10 +96,22 @@ function plot_variable_by_step(data_table,variable)
         plot(steps{k}{:,variable})
         hold on
     end
-    xlabel('samples')
-    ylabel(variable,'Interpreter', 'none')
-    
-    
+end
+
+function plot_jerk_by_step(data_table)
+    HS = getHSindices(data_table);
+
+    steps = cell((size(HS,1)-1),1);
+
+    for k = 1:(size(HS,1)-1)
+        cycle = data_table(HS(k):HS(k+1),:);
+        steps{k,1} = cycle;
+    end
+
+    for k = 1:(size(steps,1))
+        plot(diff(steps{k}{:,'accely'}))
+        hold on
+    end
 end
 
 % returns the indices of the rows of the data table in which a heelstrike occurs
