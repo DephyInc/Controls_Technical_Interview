@@ -60,7 +60,10 @@ function [ankleTorquePredictions] = predictAnkleTorque(data_table)
             else
                 delta_t = 10^-3*(data_table.state_time(i) - data_table.state_time(i-1));
             end
-            shank_ang = shank_ang + delta_t*data_table.gyroz(i);
+            shank_ang = shank_ang + delta_t*data_table.gyroz(i); 
+            %this is a quick and dirty implementation. Would ordinarily 
+            %kalman filter to protect against noise, find angle from biomechanics.
+            %this works for phase variable though.
             int_shank_ang = int_shank_ang + delta_t*(shank_ang-mean_shank_value);
             phase = atan2(int_shank_ang,shank_ang-mean_shank_value);
             phase_variable_time(i) = phase;
