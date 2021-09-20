@@ -43,14 +43,16 @@ gait_state = UNKNOWN; % -4 signifies unknown, 1 signifies stance, 0 signifies sw
 
 % Feature HS1
 HS1_spike = 0; % ankle angle spike has occured when = 1, has not when = 0
-HS1_state = 0; %initialize as 0, indicates if ankle angle is increasing or decreasing, 0 is the starting value, 1 is increasing, -1 is decreasing
+HS1_state = 0; %initialize as 0, indicates if ankle angle is increasing or decreasing,
+% 0 is the starting value, 1 is increasing, -1 is decreasing
 HS1_state_prev = 0; % initialize as 0
 HS1_data_prev = 0; % initialize as 0
 HS1_min = 1200; % the minimum gyroz value require to check if a spike has occured, estimated by inspecting data plots
 
 % Feature HS2
 HS2_spike = 0; % ankle angle spike has occured when = 1, has not when = 0
-HS2_state = 0; %initialize as 0, indicates if ankle angle is increasing or decreasing, 0 is the starting value, 1 is increasing, -1 is decreasing
+HS2_state = 0; %initialize as 0, indicates if ankle angle is increasing or decreasing,
+% 0 is the starting value, 1 is increasing, -1 is decreasing
 HS2_state_prev = 0; % initialize as 0
 HS2_data_prev = 0; % initialize as 0
 
@@ -58,21 +60,23 @@ HS2_data_prev = 0; % initialize as 0
 
 % Feature TO1
 TO1_spike = 0; % battery current spike has occured when = 1, has not when = 0
-TO1_state = 0; % initialize as 0, indicates if battery current is increasing or decreasing, 0 is the starting value, 1 is increasing, -1 is decreasing
+TO1_state = 0; % initialize as 0, indicates if battery current is increasing or decreasing,
+% 0 is the starting value, 1 is increasing, -1 is decreasing
 TO1_state_prev = 0;
 TO1_data_prev = 0; % initailize as 0
 TO1_min = 900; % the minimum battery current required to check if a spike has occured, estimated by inspecting data plots
 
 % Feature TO2
 TO2_spike = 0; % ankle angle spike has occured when = 1, has not when = 0
-TO2_state = 0; %initialize as 0, indicates if ankle angle is increasing or decreasing, 0 is the starting value, 1 is increasing, -1 is decreasing
+TO2_state = 0; %initialize as 0, indicates if ankle angle is increasing or decreasing,
+% 0 is the starting value, 1 is increasing, -1 is decreasing
 TO2_state_prev = 0; % initialize as 0
 TO2_data_prev = 0; % initialize as 0
 
 % --- Step Through Data ---
 for i = 1:size(data_table) % iterate through data
     
-    % *** In Swing Phase or at Beginning of Data (when gait_state is unknown) ***
+    % At beginning of data when gait_state is unknown OR in swing phase
     if((gait_state == UNKNOWN) || (gait_state == SWING))
         % *** Detect Heelstrike ***
         
@@ -111,9 +115,7 @@ for i = 1:size(data_table) % iterate through data
             
             % If HS2 has occured
             if(HS2_spike == 1) % when ankle dip occurs, gait_state becomes 1, stance
-                
-                % *** Heel Strike Detected/ Beginning of Stance Phase ***
-                gait_state = STANCE; 
+                gait_state = STANCE;
                 HS1_spike = 0; % set back to 0
                 HS2_spike = 0; % set back to 0
             end
@@ -122,7 +124,7 @@ for i = 1:size(data_table) % iterate through data
         
     end
     
-    % *** In Stance Phase ***
+    % In stance phase
     if(gait_state == STANCE)
         
         % *** Detect Toe Off ***
@@ -162,7 +164,6 @@ for i = 1:size(data_table) % iterate through data
             TO2_state_prev = TO2_state; % save current state into previous state variable
             if(TO2_spike == 1) % when ankle spike occurs, gait_state becomes 0, swing
                 
-                % *** Toe Off Detected/ Beginning of Swing Phase ***
                 gait_state = SWING;
                 TO1_spike = 0; % set back to 0
                 TO2_spike = 0; % set back to 0

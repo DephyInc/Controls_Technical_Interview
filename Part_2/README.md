@@ -26,13 +26,20 @@ You know you can’t prototype solutions for all your questions, but want to see
 3. Please fill out the following:
 
 	- Did you implement Task 1 in Matlab or Python?
-		- >ADD YOUR ANSWER HERE
+		- I implemented Task 1 in Matlab.
 	- Which function did you choose to implement for Task 1?
-		- >ADD YOUR ANSWER HERE
+		- I chose to implement the isUserInStance function.
 	- Briefly describe your implementation (1-3 sentences).
-		- >ADD YOUR ANSWER HERE
+		- I implemented the isUserInState function by determining when heelstrike and toe off occurred for each step, during an
+          iteration through the data, to mimic real-time decisions. Heelstrike was detected by determining when an ankle angle
+          spike occurred after a large gyroz spike. Toe off was detected by determining when an ankle angle spike occurred after a 
+          battery current spike. (Note: this implementation did not function well for the isUserInStance/dataset/rachel_running_6mph_left.csv
+          dataset because there was no large battery current spike, and therefore toe off could not easily be detected)
 	- Briefly describe your improvements to the file of helper functions.
-
+        - The improvements I implemented in the helper function file were adding comments for clarity (including adding
+          description, input, and output comments for each function), making the function naming convention consistent, renaming
+          a variable to make it clearer what it is used for, and making two code changes in getHSindices. 
+        
 -------------------------
 
 ## Rules of Engagement

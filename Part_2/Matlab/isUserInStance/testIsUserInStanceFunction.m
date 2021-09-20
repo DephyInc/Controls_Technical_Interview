@@ -13,7 +13,7 @@ function testIsUserInStance()
 
         isUserInStancePredictions = isUserInStance(data_table);
 
-        figure
+        figure(i)
         plot(data_table.gait_state, 'b')
         hold on;
         plot(isUserInStancePredictions,'r')
