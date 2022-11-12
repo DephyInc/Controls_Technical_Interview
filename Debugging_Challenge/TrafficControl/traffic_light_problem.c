@@ -23,7 +23,8 @@
 // Variable(s)
 //****************************************************************************
 struct intersection_s myIntersection;
-static int8_t t = 0;
+static int8_t th = 0;	// This variable will be used to track how long the horizontal traffic light has spent in its current color
+static int8_t tv = 0;	// This variable will be used to track how long the vertical traffic light has spent in its current color
 
 //****************************************************************************
 // Private Function Prototype(s):
@@ -113,10 +114,12 @@ static void initIntersection(void)
 
 static char * setHorizantalTrafficLight(struct intersection_s intersection)
 {
+	// Increment time at current color
+	th++;
 	
-	char * currentColor = intersection.horizantalTrafficColor;
-	char * newColor = currentColor;
-	traffic_light_colors_t currentColorEnum = -1;
+	char * currentColor = intersection.horizantalTrafficColor;	// Current color of traffic light
+	char * newColor = currentColor;								// Initialize new color as current color
+	traffic_light_colors_t currentColorEnum = -1;				// Initialize enum for color
 
 	switch (*currentColor)
 	{
@@ -131,38 +134,47 @@ static char * setHorizantalTrafficLight(struct intersection_s intersection)
 			break;
 	}
 
-	t++;
-	printf("horizantal t = %d\n",t);
-
+	// Count of cars waiting in each direction
 	int8_t horizantalWait = intersection.eastboundCars.carsWaitingAtIntersection + intersection.westboundCars.carsWaitingAtIntersection;
 	int8_t verticalWait = intersection.northboundCars.carsWaitingAtIntersection + intersection.southboundCars.carsWaitingAtIntersection;
 
+	// Determine new light color (if light changes, reset t to 0)
 	switch(currentColorEnum)
 	{
+		// Change light from RED to GREEN if:
+		// 		- the horizontal light is red
+		//		- there are more cars waiting horizontally than vertically
+		//		- the vertical light is red (we don't want any crashes!)
 		case RED:
 			if((horizantalWait >= verticalWait) && (strcmp(intersection.verticalTrafficColor,"R") == 0))
 			{
 				newColor = "G";
-				t = 0;
+				th = 0;
 			}
 			break;
+		// Change light from GREEN to YELLOW if:
+		// 		- the horizontal light is green
+		//		- there are more cars waiting vertically OR the light has been green for more than 10 seconds
 		case GREEN:
-			if((horizantalWait < verticalWait) || t > 10)
+			if((horizantalWait < verticalWait) || th > 10)
 			{
 				newColor = "Y";
-				t = 0;
+				th = 0;
 			}
 			break;
+		// Change the light from YELLOW to RED if:
+		//		- the horizontal light has been yellow for at least 1 second
 		case YELLOW:
-			if(t > 1)
+			if(th > 1)
 			{
 				newColor = "R";
-				t = 0;
+				th = 0;
 			}
 			break;
+		// Set default case to RED to minimize risk of crashes
 		default:
 			newColor = "R";
-			t = 0;	
+			th = 0;	
 	}
 
 	return newColor;
@@ -170,10 +182,12 @@ static char * setHorizantalTrafficLight(struct intersection_s intersection)
 
 static char * setVerticalTrafficLight(struct intersection_s intersection)
 {
-	
-	char * currentColor = intersection.verticalTrafficColor;
-	char * newColor = currentColor;
-	traffic_light_colors_t currentColorEnum = -1;
+	// Increment time at current color
+	tv++;
+
+	char * currentColor = intersection.verticalTrafficColor;	// Current color of traffic light
+	char * newColor = currentColor;								// Initialize new color as current color
+	traffic_light_colors_t currentColorEnum = -1;				// Initialize enum for color
 
 	switch (*currentColor)
 	{
@@ -188,38 +202,47 @@ static char * setVerticalTrafficLight(struct intersection_s intersection)
 			break;
 	}
 
-	t++;
-	printf("vertical t = %d\n",t);
-
+	// Count of cars waiting in each direction
 	int8_t horizantalWait = intersection.eastboundCars.carsWaitingAtIntersection + intersection.westboundCars.carsWaitingAtIntersection;
 	int8_t verticalWait = intersection.northboundCars.carsWaitingAtIntersection + intersection.southboundCars.carsWaitingAtIntersection;
 	
+	// Determine new light color (if light changes, reset t to 0)
 	switch(currentColorEnum)
 	{
+		// Change light from RED to GREEN if:
+		// 		- the horizontal light is red
+		//		- there are more cars waiting horizontally than vertically
+		//		- the vertical light is red (we don't want any crashes!)
 		case RED:
 			if((horizantalWait < verticalWait) && (strcmp(intersection.horizantalTrafficColor,"R") == 0))
 			{
 				newColor = "G";
-				t = 0;
+				tv = 0;
 			}
 			break;
+		// Change light from GREEN to YELLOW if:
+		// 		- the horizontal light is green
+		//		- there are more cars waiting vertically OR the light has been green for more than 10 seconds
 		case GREEN:
-			if((horizantalWait >= verticalWait) || t > 10)
+			if((horizantalWait >= verticalWait) || tv > 10)
 			{
 				newColor = "Y";
-				t = 0;
+				tv = 0;
 			}
 			break;
+		// Change the light from YELLOW to RED if:
+		//		- the horizontal light has been yellow for at least 1 second
 		case YELLOW:
-			if(t > 1)
+			if(tv > 1)
 			{
 				newColor = "R";
-				t = 0;
+				tv = 0;
 			}
 			break;
+		// Set default case to RED to minimize risk of crashes
 		default:
 			newColor = "R";
-			t = 0;
+			tv = 0;
 	}
 
 	return newColor;
