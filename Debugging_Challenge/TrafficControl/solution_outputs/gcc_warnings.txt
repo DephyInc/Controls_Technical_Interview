@@ -1,0 +1,17 @@
+smoffat@irbt-8793m TrafficControl % gcc traffic_light_problem.c -o traffic_light_problem
+In file included from traffic_light_problem.c:16:
+./traffic_light_problem.h:59:1: warning: return type of 'main' is not 'int' [-Wmain-return-type]
+void main(void); //Main function to run the traffic simulation
+^
+./traffic_light_problem.h:59:1: note: change return type to 'int'
+void main(void); //Main function to run the traffic simulation
+^~~~
+int
+traffic_light_problem.c:47:1: warning: return type of 'main' is not 'int' [-Wmain-return-type]
+void main(void)
+^
+traffic_light_problem.c:47:1: note: change return type to 'int'
+void main(void)
+^~~~
+int
+2 warnings generated.
