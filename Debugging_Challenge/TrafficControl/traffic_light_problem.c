@@ -23,7 +23,6 @@
 // Variable(s)
 //****************************************************************************
 struct intersection_s myIntersection;
-static int8_t t = 0;
 
 //****************************************************************************
 // Private Function Prototype(s):
@@ -113,7 +112,7 @@ static void initIntersection(void)
 
 static char * setHorizantalTrafficLight(struct intersection_s intersection)
 {
-	
+	int8_t t = 0;
 	char * currentColor = intersection.horizantalTrafficColor;
 	char * newColor = currentColor;
 	traffic_light_colors_t currentColorEnum = -1;
@@ -132,29 +131,33 @@ static char * setHorizantalTrafficLight(struct intersection_s intersection)
 	}
 
 	t++;
+
+	int8_t horizantalWait = intersection.eastboundCars.carsWaitingAtIntersection + intersection.westboundCars.carsWaitingAtIntersection;
+	int8_t verticalWait = intersection.northboundCars.carsWaitingAtIntersection + intersection.southboundCars.carsWaitingAtIntersection;
+
 	switch(currentColorEnum)
 	{
 		case RED:
-			if((intersection.eastboundCars.carsWaitingAtIntersection + intersection.westboundCars.carsWaitingAtIntersection >= intersection.northboundCars.carsWaitingAtIntersection + intersection.southboundCars.carsWaitingAtIntersection) && (strcmp(intersection.verticalTrafficColor,"R") == 0))
+			if((horizantalWait >= verticalWait) && (strcmp(intersection.verticalTrafficColor,"R") == 0))
 			{
 				newColor = "G";
 				t = 0;
 			}
-
+			break;
 		case GREEN:
-			if((intersection.eastboundCars.carsWaitingAtIntersection + intersection.westboundCars.carsWaitingAtIntersection < intersection.northboundCars.carsWaitingAtIntersection + intersection.southboundCars.carsWaitingAtIntersection) || t > 10)
+			if((horizantalWait < verticalWait) || t > 10)
 			{
 				newColor = "Y";
 				t = 0;
 			}
-
+			break;
 		case YELLOW:
 			if(t > 1)
 			{
 				newColor = "R";
 				t = 0;
 			}
-
+			break;
 		default:
 			newColor = "R";
 			t = 0;	
@@ -165,6 +168,7 @@ static char * setHorizantalTrafficLight(struct intersection_s intersection)
 
 static char * setVerticalTrafficLight(struct intersection_s intersection)
 {
+	int8_t t = 0;
 	char * currentColor = intersection.verticalTrafficColor;
 	char * newColor = currentColor;
 	traffic_light_colors_t currentColorEnum = -1;
@@ -183,24 +187,27 @@ static char * setVerticalTrafficLight(struct intersection_s intersection)
 	}
 
 	t++;
+	printf("%d\n",t);
+
+	int8_t horizantalWait = intersection.eastboundCars.carsWaitingAtIntersection + intersection.westboundCars.carsWaitingAtIntersection;
+	int8_t verticalWait = intersection.northboundCars.carsWaitingAtIntersection + intersection.southboundCars.carsWaitingAtIntersection;
+	
 	switch(currentColorEnum)
 	{
 		case RED:
-			if((intersection.eastboundCars.carsWaitingAtIntersection + intersection.westboundCars.carsWaitingAtIntersection < intersection.northboundCars.carsWaitingAtIntersection + intersection.southboundCars.carsWaitingAtIntersection) && (strcmp(intersection.horizantalTrafficColor,"R") == 0))
+			if((horizantalWait < verticalWait) && (strcmp(intersection.horizantalTrafficColor,"R") == 0))
 			{
 				newColor = "G";
 				t = 0;
 			}
 			break;
-
 		case GREEN:
-			if((intersection.eastboundCars.carsWaitingAtIntersection + intersection.westboundCars.carsWaitingAtIntersection >= intersection.northboundCars.carsWaitingAtIntersection + intersection.southboundCars.carsWaitingAtIntersection) || t > 10)
+			if((horizantalWait >= verticalWait) || t > 10)
 			{
 				newColor = "Y";
 				t = 0;
 			}
 			break;
-
 		case YELLOW:
 			if(t > 1)
 			{
@@ -208,11 +215,9 @@ static char * setVerticalTrafficLight(struct intersection_s intersection)
 				t = 0;
 			}
 			break;
-
 		default:
 			newColor = "R";
 			t = 0;
-			break;	
 	}
 
 	return newColor;
@@ -425,7 +430,7 @@ static void delay(int16_t ms)
 static int8_t checkForCrashes(void)
 {
 	int8_t isHorizantalCarInIntersection = (myIntersection.westboundCars.carsInIntersection | myIntersection.eastboundCars.carsInIntersection);
-	int8_t isVerticalCarInIntersection = (myIntersection.westboundCars.carsInIntersection | myIntersection.eastboundCars.carsInIntersection);
+	int8_t isVerticalCarInIntersection = (myIntersection.northboundCars.carsInIntersection | myIntersection.southboundCars.carsInIntersection);
 
 	if(isHorizantalCarInIntersection && isVerticalCarInIntersection){return 1;}
 	return 0;
