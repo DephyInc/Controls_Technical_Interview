@@ -44,7 +44,7 @@ static int8_t checkForCrashes(void);
 //****************************************************************************
 
 //Main function to run the traffic simulation
-void main(void)
+int main(void)
 {
 	//Seed my random number generator
 	srand(time(0));
@@ -75,7 +75,7 @@ void main(void)
 		if(checkForCrashes() == 1)
 		{
 			printf("FAIL: Car crash!\n");
-			return;
+			return 0;
 		}
 
 		//Check if all the cars have left the lanes
@@ -83,7 +83,7 @@ void main(void)
 		{
 			int16_t totalWaitTime = myIntersection.northboundCars.timeWaiting + myIntersection.southboundCars.timeWaiting + myIntersection.westboundCars.timeWaiting + myIntersection.eastboundCars.timeWaiting;
 			printf("SUCCESS: You got all the cars through! The total wait time was: %i seconds!\n", totalWaitTime);
-			return;
+			return 0;
 		}
 	}
 
@@ -91,6 +91,8 @@ void main(void)
 	int8_t totalCarsThatMadeIt = myIntersection.northboundCars.carsThatHaveLeft + myIntersection.southboundCars.carsThatHaveLeft + myIntersection.westboundCars.carsThatHaveLeft + myIntersection.eastboundCars.carsThatHaveLeft;
 	int16_t totalWaitTime = myIntersection.northboundCars.timeWaiting + myIntersection.southboundCars.timeWaiting + myIntersection.westboundCars.timeWaiting + myIntersection.eastboundCars.timeWaiting;
 	printf("FAIL: Traffic Jam! You ran out of time. You got %i/40 cars through in 120 seconds. The total wait time was: %i seconds.\n", totalCarsThatMadeIt, totalWaitTime);
+	
+	return 0;
 }
 
 //****************************************************************************

@@ -56,6 +56,6 @@ struct intersection_s
 //****************************************************************************
 // Public Function Prototype(s):
 //***************************************************************************
-void main(void); //Main function to run the traffic simulation
+int main(void); //Main function to run the traffic simulation
 
 #endif //INC_TRAFFIC_LIGHT_PROBLEM_H
