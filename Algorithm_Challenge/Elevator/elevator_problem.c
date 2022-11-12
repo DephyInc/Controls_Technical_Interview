@@ -46,7 +46,27 @@ static void delay(int16_t ms);
 //Note: The output should be a number between 0 and (BUILDING_HEIGHT-1), inclusive
 static int8_t setNextElevatorStop(struct building_s building)
 {
-	return rand() % BUILDING_HEIGHT;
+	int8_t floorsAway = BUILDING_HEIGHT;	// Initialize difference between floors as max building height
+	int8_t nextElevatorStop = rand() + BUILDING_HEIGHT;	// Initialize next stop randomly
+
+	// Determine difference between floors (current vs. destination) for each passenger
+	for(int8_t i = 0; i < ELEVATOR_MAX_CAPACITY; i++)
+	{
+		// Check that passenger exists
+		if (building.elevator.passengers[i] == -1)
+		{
+			continue;
+		}
+		// Set the next floor stop as the passenger's destination closest to the current floor
+		if (abs(building.elevator.currentFloor - building.elevator.passengers[i]) < floorsAway)
+		{
+			nextElevatorStop = building.elevator.passengers[i];
+			floorsAway = abs(building.elevator.currentFloor - nextElevatorStop);
+		}
+	}
+	
+	printf("Next Stop = %d\n", nextElevatorStop);
+	return nextElevatorStop;
 }
 
 
@@ -70,7 +90,8 @@ int main(void)
 	initBuilding();
 
 	//Draw the initial state of the building, with elevator doors closed
-	system("clear");
+	// system("clear");
+	printf("\n\n\n");
 	drawBuilding(myBuilding,1);
 	fflush(stdout);
 	delay(1000);
@@ -85,7 +106,8 @@ int main(void)
 		moveElevator(&myBuilding.elevator);
 
 		//Draw the building, with elevator doors closed
-		system("clear");
+		// system("clear");
+		printf("\n\n\n");
 		drawBuilding(myBuilding,1);
 		fflush(stdout);
 		delay(1000);
@@ -94,7 +116,8 @@ int main(void)
 		if(myBuilding.elevator.currentFloor == myBuilding.elevator.nextStop)
 		{
 			//Redraw the building, with elevator doors open
-			system("clear");
+			// system("clear");
+			printf("\n\n\n");
 			drawBuilding(myBuilding,0);
 			fflush(stdout);
 			delay(1000);
@@ -104,14 +127,16 @@ int main(void)
 			stopElevator(&myBuilding);
 
 			//Redraw the building, with elevator doors open, showing the change
-			system("clear");
+			// system("clear");
+			printf("\n\n\n");
 			drawBuilding(myBuilding,0);
 			fflush(stdout);
 			delay(1000);
 			i++;
 
 			//Redraw the building, with elevator doors closed
-			system("clear");
+			// system("clear");
+			printf("\n\n\n");
 			drawBuilding(myBuilding,1);
 			fflush(stdout);
 			delay(1000);
