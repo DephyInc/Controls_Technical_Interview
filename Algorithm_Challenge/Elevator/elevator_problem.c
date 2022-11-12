@@ -47,10 +47,10 @@ static void delay(int16_t ms);
 static int8_t setNextElevatorStop(struct building_s building)
 {
 	int8_t floorsAway = BUILDING_HEIGHT;	// Initialize difference between floors as max building height
-	int8_t nextElevatorStop = rand() + BUILDING_HEIGHT;	// Initialize next stop randomly
+	int8_t nextElevatorStop = -1;	// Initialize next stop at -1
 
 	// Determine difference between floors (current vs. destination) for each passenger
-	for(int8_t i = 0; i < ELEVATOR_MAX_CAPACITY; i++)
+	for (int8_t i = 0; i < ELEVATOR_MAX_CAPACITY; i++)
 	{
 		// Check that passenger exists
 		if (building.elevator.passengers[i] == -1)
@@ -62,6 +62,26 @@ static int8_t setNextElevatorStop(struct building_s building)
 		{
 			nextElevatorStop = building.elevator.passengers[i];
 			floorsAway = abs(building.elevator.currentFloor - nextElevatorStop);
+		}
+	}
+
+	// If no passengers, check for closest floor that still has departures
+	while(nextElevatorStop == -1)
+	{
+		// Iterate through floors to check for departures
+		for (int8_t f = 0; f < BUILDING_HEIGHT; f++)
+		{
+			for (int8_t j = 0; j < 2; j++)
+			{
+				if (building.floors[f].departures[j] != -1)
+				{
+					if (abs(building.elevator.currentFloor - f) < floorsAway)
+					{
+						nextElevatorStop = f;
+						floorsAway = abs(building.elevator.currentFloor - nextElevatorStop);
+					}
+				}
+			}
 		}
 	}
 	
