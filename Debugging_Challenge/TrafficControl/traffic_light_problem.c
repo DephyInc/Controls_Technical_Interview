@@ -23,6 +23,7 @@
 // Variable(s)
 //****************************************************************************
 struct intersection_s myIntersection;
+static int8_t t = 0;
 
 //****************************************************************************
 // Private Function Prototype(s):
@@ -112,23 +113,22 @@ static void initIntersection(void)
 
 static char * setHorizantalTrafficLight(struct intersection_s intersection)
 {
-	static int8_t t = 0;
+	
 	char * currentColor = intersection.horizantalTrafficColor;
 	char * newColor = currentColor;
 	traffic_light_colors_t currentColorEnum = -1;
 
-	if(strcmp(currentColor,"R") == 0)
+	if (strcmp(currentColor,"R") == 0)
 	{
 		currentColorEnum = RED;
 	}
-	else if(strcmp(currentColor,"G") == 0)
+	else if (strcmp(currentColor,"G") == 0)
 	{
 		currentColorEnum = GREEN;
-
-		if(strcmp(currentColor,"Y") == 0)
-		{
-			currentColorEnum = YELLOW;
-		}
+	}
+	else if (strcmp(currentColor,"Y") == 0)
+	{
+		currentColorEnum = YELLOW;
 	}
 
 	t++;
@@ -165,21 +165,19 @@ static char * setHorizantalTrafficLight(struct intersection_s intersection)
 
 static char * setVerticalTrafficLight(struct intersection_s intersection)
 {
-	static int8_t t = 0;
 	char * currentColor = intersection.verticalTrafficColor;
 	char * newColor = currentColor;
 	traffic_light_colors_t currentColorEnum = -1;
 
-	if(strcmp(currentColor,"R") == 0)
+	if (strcmp(currentColor,"R") == 0)
 	{
 		currentColorEnum = RED;
-
-		if(strcmp(currentColor,"G") == 0)
-		{	
-			currentColorEnum = GREEN;
-		}
 	}
-	else if(strcmp(currentColor,"Y") == 0)
+	else if (strcmp(currentColor,"G") == 0)
+	{	
+		currentColorEnum = GREEN;
+	}
+	else if (strcmp(currentColor,"Y") == 0)
 	{
 		currentColorEnum = YELLOW;
 	}
