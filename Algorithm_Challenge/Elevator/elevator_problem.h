@@ -49,6 +49,6 @@ struct building_s
 //****************************************************************************
 // Public Function Prototype(s):
 //***************************************************************************
-void main(void); //Main function to run the elevator simulation
+int main(void); //Main function to run the elevator simulation
 
 #endif //INC_ELEVATOR_PROBLEM_H

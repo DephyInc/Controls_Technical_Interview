@@ -46,7 +46,7 @@ static void delay(int16_t ms);
 //Note: The output should be a number between 0 and (BUILDING_HEIGHT-1), inclusive
 static int8_t setNextElevatorStop(struct building_s building)
 {
-	return 0;
+	return rand() % BUILDING_HEIGHT;
 }
 
 
@@ -61,7 +61,7 @@ static int8_t setNextElevatorStop(struct building_s building)
 //****************************************************************************
 
 //Main function to run the elevator simulation
-void main(void)
+int main(void)
 {
 	//Seed my random number generator
 	srand(time(0));
@@ -128,7 +128,7 @@ void main(void)
 		if(numPeopleAtDestination == 10)
 		{
 			printf("SUCCESS: You got all the people through! The total time was: %i seconds!\n", i);
-			return;
+			return 0;
 		}
 	}
 
@@ -139,6 +139,8 @@ void main(void)
 		numPeopleAtDestination += myBuilding.floors[f].arrivals;
 	}
 	printf("FAIL: You ran out of time. You got %i/10 people through in 60 seconds.\n", numPeopleAtDestination);
+
+	return 0;
 }
 
 //****************************************************************************
