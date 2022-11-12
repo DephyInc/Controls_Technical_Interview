@@ -53,36 +53,35 @@ static int8_t setNextElevatorStop(struct building_s building)
 	for (int8_t i = 0; i < ELEVATOR_MAX_CAPACITY; i++)
 	{
 		// Check that passenger exists
-		if (building.elevator.passengers[i] == -1)
+		if (building.elevator.passengers[i] != -1)
 		{
-			continue;
-		}
-		// Set the next floor stop as the passenger's destination closest to the current floor
-		if (abs(building.elevator.currentFloor - building.elevator.passengers[i]) < floorsAway)
-		{
-			nextElevatorStop = building.elevator.passengers[i];
-			floorsAway = abs(building.elevator.currentFloor - nextElevatorStop);
-		}
-	}
-
-	// If no passengers, check for closest floor that still has departures
-	while(nextElevatorStop == -1)
-	{
-		// Iterate through floors to check for departures
-		for (int8_t f = 0; f < BUILDING_HEIGHT; f++)
-		{
-			for (int8_t j = 0; j < 2; j++)
+			// Set the next floor stop as the passenger's destination closest to the current floor
+			if (abs(building.elevator.currentFloor - building.elevator.passengers[i]) < floorsAway)
 			{
-				if (building.floors[f].departures[j] != -1)
+				nextElevatorStop = building.elevator.passengers[i];
+				floorsAway = abs(building.elevator.currentFloor - nextElevatorStop);
+			}
+		}
+		// If there is an open spot in the elevator, check if there are any departures on a closer floor
+		else 
+		{
+			// Iterate through floors to check for departures
+			for (int8_t f = 0; f < BUILDING_HEIGHT; f++)
+			{
+				for (int8_t j = 0; j < 2; j++)
 				{
-					if (abs(building.elevator.currentFloor - f) < floorsAway)
+					if (building.floors[f].departures[j] != -1)
 					{
-						nextElevatorStop = f;
-						floorsAway = abs(building.elevator.currentFloor - nextElevatorStop);
+						if (abs(building.elevator.currentFloor - f) < floorsAway)
+						{
+							nextElevatorStop = f;
+							floorsAway = abs(building.elevator.currentFloor - nextElevatorStop);
+						}
 					}
 				}
 			}
 		}
+		
 	}
 	
 	printf("Next Stop = %d\n", nextElevatorStop);
