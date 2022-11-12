@@ -39,7 +39,7 @@ struct lane_of_cars_s
 	int8_t carsThatHaveLeft;
 	
 	int8_t popularity;
-	int16_t timeWaiting;
+	int16_t timeWaiting;	// int8_t has limit of -127 to 128
 };
 
 struct intersection_s
