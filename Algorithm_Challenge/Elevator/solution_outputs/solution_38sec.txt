@@ -1,0 +1,438 @@
+smoffat@irbt-8793m Elevator % ./elevator_problem
+
+          DEPARTURES|     |ARRIVALS
+FLOOR 0:          23|     |
+FLOOR 1:          42| ___ |
+FLOOR 2:          11|     |
+FLOOR 3:          42|     |
+FLOOR 4:          02|     |
+
+
+
+
+
+          DEPARTURES|     |ARRIVALS
+FLOOR 0:          23|     |
+FLOOR 1:          42| ___ |
+FLOOR 2:          11|     |
+FLOOR 3:          42|     |
+FLOOR 4:          02|     |
+
+
+
+
+
+          DEPARTURES|     |ARRIVALS
+FLOOR 0:          23|     |
+FLOOR 1:          42  ___  
+FLOOR 2:          11|     |
+FLOOR 3:          42|     |
+FLOOR 4:          02|     |
+
+
+
+
+
+          DEPARTURES|     |ARRIVALS
+FLOOR 0:          23|     |
+FLOOR 1:              42_  
+FLOOR 2:          11|     |
+FLOOR 3:          42|     |
+FLOOR 4:          02|     |
+
+
+
+
+
+          DEPARTURES|     |ARRIVALS
+FLOOR 0:          23|     |
+FLOOR 1:            | 42_ |
+FLOOR 2:          11|     |
+FLOOR 3:          42|     |
+FLOOR 4:          02|     |
+
+
+
+
+
+          DEPARTURES|     |ARRIVALS
+FLOOR 0:          23|     |
+FLOOR 1:            |     |
+FLOOR 2:          11| 42_ |
+FLOOR 3:          42|     |
+FLOOR 4:          02|     |
+
+
+
+
+
+          DEPARTURES|     |ARRIVALS
+FLOOR 0:          23|     |
+FLOOR 1:            |     |
+FLOOR 2:          11  42_  
+FLOOR 3:          42|     |
+FLOOR 4:          02|     |
+
+
+
+
+
+          DEPARTURES|     |ARRIVALS
+FLOOR 0:          23|     |
+FLOOR 1:            |     |
+FLOOR 2:              411  x
+FLOOR 3:          42|     |
+FLOOR 4:          02|     |
+
+
+
+
+
+          DEPARTURES|     |ARRIVALS
+FLOOR 0:          23|     |
+FLOOR 1:            |     |
+FLOOR 2:            | 411 |x
+FLOOR 3:          42|     |
+FLOOR 4:          02|     |
+
+
+
+
+
+          DEPARTURES|     |ARRIVALS
+FLOOR 0:          23|     |
+FLOOR 1:            | 411 |
+FLOOR 2:            |     |x
+FLOOR 3:          42|     |
+FLOOR 4:          02|     |
+
+
+
+
+
+          DEPARTURES|     |ARRIVALS
+FLOOR 0:          23|     |
+FLOOR 1:              411  
+FLOOR 2:            |     |x
+FLOOR 3:          42|     |
+FLOOR 4:          02|     |
+
+
+
+
+
+          DEPARTURES|     |ARRIVALS
+FLOOR 0:          23|     |
+FLOOR 1:              4__  xx
+FLOOR 2:            |     |x
+FLOOR 3:          42|     |
+FLOOR 4:          02|     |
+
+
+
+
+
+          DEPARTURES|     |ARRIVALS
+FLOOR 0:          23|     |
+FLOOR 1:            | 4__ |xx
+FLOOR 2:            |     |x
+FLOOR 3:          42|     |
+FLOOR 4:          02|     |
+
+
+
+
+
+          DEPARTURES|     |ARRIVALS
+FLOOR 0:          23| 4__ |
+FLOOR 1:            |     |xx
+FLOOR 2:            |     |x
+FLOOR 3:          42|     |
+FLOOR 4:          02|     |
+
+
+
+
+
+          DEPARTURES|     |ARRIVALS
+FLOOR 0:          23  4__  
+FLOOR 1:            |     |xx
+FLOOR 2:            |     |x
+FLOOR 3:          42|     |
+FLOOR 4:          02|     |
+
+
+
+
+
+          DEPARTURES|     |ARRIVALS
+FLOOR 0:              423  
+FLOOR 1:            |     |xx
+FLOOR 2:            |     |x
+FLOOR 3:          42|     |
+FLOOR 4:          02|     |
+
+
+
+
+
+          DEPARTURES|     |ARRIVALS
+FLOOR 0:            | 423 |
+FLOOR 1:            |     |xx
+FLOOR 2:            |     |x
+FLOOR 3:          42|     |
+FLOOR 4:          02|     |
+
+
+
+
+
+          DEPARTURES|     |ARRIVALS
+FLOOR 0:            |     |
+FLOOR 1:            | 423 |xx
+FLOOR 2:            |     |x
+FLOOR 3:          42|     |
+FLOOR 4:          02|     |
+
+
+
+
+
+          DEPARTURES|     |ARRIVALS
+FLOOR 0:            |     |
+FLOOR 1:            |     |xx
+FLOOR 2:            | 423 |x
+FLOOR 3:          42|     |
+FLOOR 4:          02|     |
+
+
+
+
+
+          DEPARTURES|     |ARRIVALS
+FLOOR 0:            |     |
+FLOOR 1:            |     |xx
+FLOOR 2:              423  x
+FLOOR 3:          42|     |
+FLOOR 4:          02|     |
+
+
+
+
+
+          DEPARTURES|     |ARRIVALS
+FLOOR 0:            |     |
+FLOOR 1:            |     |xx
+FLOOR 2:              4_3  xx
+FLOOR 3:          42|     |
+FLOOR 4:          02|     |
+
+
+
+
+
+          DEPARTURES|     |ARRIVALS
+FLOOR 0:            |     |
+FLOOR 1:            |     |xx
+FLOOR 2:            | 4_3 |xx
+FLOOR 3:          42|     |
+FLOOR 4:          02|     |
+
+
+
+
+
+          DEPARTURES|     |ARRIVALS
+FLOOR 0:            |     |
+FLOOR 1:            |     |xx
+FLOOR 2:            |     |xx
+FLOOR 3:          42| 4_3 |
+FLOOR 4:          02|     |
+
+
+
+
+
+          DEPARTURES|     |ARRIVALS
+FLOOR 0:            |     |
+FLOOR 1:            |     |xx
+FLOOR 2:            |     |xx
+FLOOR 3:          42  4_3  
+FLOOR 4:          02|     |
+
+
+
+
+
+          DEPARTURES|     |ARRIVALS
+FLOOR 0:            |     |
+FLOOR 1:            |     |xx
+FLOOR 2:            |     |xx
+FLOOR 3:              442  x
+FLOOR 4:          02|     |
+
+
+
+
+
+          DEPARTURES|     |ARRIVALS
+FLOOR 0:            |     |
+FLOOR 1:            |     |xx
+FLOOR 2:            |     |xx
+FLOOR 3:            | 442 |x
+FLOOR 4:          02|     |
+
+
+
+
+
+          DEPARTURES|     |ARRIVALS
+FLOOR 0:            |     |
+FLOOR 1:            |     |xx
+FLOOR 2:            |     |xx
+FLOOR 3:            |     |x
+FLOOR 4:          02| 442 |
+
+
+
+
+
+          DEPARTURES|     |ARRIVALS
+FLOOR 0:            |     |
+FLOOR 1:            |     |xx
+FLOOR 2:            |     |xx
+FLOOR 3:            |     |x
+FLOOR 4:          02  442  
+
+
+
+
+
+          DEPARTURES|     |ARRIVALS
+FLOOR 0:            |     |
+FLOOR 1:            |     |xx
+FLOOR 2:            |     |xx
+FLOOR 3:            |     |x
+FLOOR 4:              022  xx
+
+
+
+
+
+          DEPARTURES|     |ARRIVALS
+FLOOR 0:            |     |
+FLOOR 1:            |     |xx
+FLOOR 2:            |     |xx
+FLOOR 3:            |     |x
+FLOOR 4:            | 022 |xx
+
+
+
+
+
+          DEPARTURES|     |ARRIVALS
+FLOOR 0:            |     |
+FLOOR 1:            |     |xx
+FLOOR 2:            |     |xx
+FLOOR 3:            | 022 |x
+FLOOR 4:            |     |xx
+
+
+
+
+
+          DEPARTURES|     |ARRIVALS
+FLOOR 0:            |     |
+FLOOR 1:            |     |xx
+FLOOR 2:            | 022 |xx
+FLOOR 3:            |     |x
+FLOOR 4:            |     |xx
+
+
+
+
+
+          DEPARTURES|     |ARRIVALS
+FLOOR 0:            |     |
+FLOOR 1:            |     |xx
+FLOOR 2:              022  xx
+FLOOR 3:            |     |x
+FLOOR 4:            |     |xx
+
+
+
+
+
+          DEPARTURES|     |ARRIVALS
+FLOOR 0:            |     |
+FLOOR 1:            |     |xx
+FLOOR 2:              0__  xxxx
+FLOOR 3:            |     |x
+FLOOR 4:            |     |xx
+
+
+
+
+
+          DEPARTURES|     |ARRIVALS
+FLOOR 0:            |     |
+FLOOR 1:            |     |xx
+FLOOR 2:            | 0__ |xxxx
+FLOOR 3:            |     |x
+FLOOR 4:            |     |xx
+
+
+
+
+
+          DEPARTURES|     |ARRIVALS
+FLOOR 0:            |     |
+FLOOR 1:            | 0__ |xx
+FLOOR 2:            |     |xxxx
+FLOOR 3:            |     |x
+FLOOR 4:            |     |xx
+
+
+
+
+
+          DEPARTURES|     |ARRIVALS
+FLOOR 0:            | 0__ |
+FLOOR 1:            |     |xx
+FLOOR 2:            |     |xxxx
+FLOOR 3:            |     |x
+FLOOR 4:            |     |xx
+
+
+
+
+
+          DEPARTURES|     |ARRIVALS
+FLOOR 0:              0__  
+FLOOR 1:            |     |xx
+FLOOR 2:            |     |xxxx
+FLOOR 3:            |     |x
+FLOOR 4:            |     |xx
+
+
+
+
+
+          DEPARTURES|     |ARRIVALS
+FLOOR 0:              ___  x
+FLOOR 1:            |     |xx
+FLOOR 2:            |     |xxxx
+FLOOR 3:            |     |x
+FLOOR 4:            |     |xx
+
+
+
+
+
+          DEPARTURES|     |ARRIVALS
+FLOOR 0:            | ___ |x
+FLOOR 1:            |     |xx
+FLOOR 2:            |     |xxxx
+FLOOR 3:            |     |x
+FLOOR 4:            |     |xx
+SUCCESS: You got all the people through! The total time was: 38 seconds!

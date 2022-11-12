@@ -46,45 +46,70 @@ static void delay(int16_t ms);
 //Note: The output should be a number between 0 and (BUILDING_HEIGHT-1), inclusive
 static int8_t setNextElevatorStop(struct building_s building)
 {
-	int8_t floorsAway = BUILDING_HEIGHT;	// Initialize difference between floors as max building height
-	int8_t nextElevatorStop = -1;	// Initialize next stop at -1
+	int8_t floorsAway = BUILDING_HEIGHT;						// Initialize difference between floors as max building height
+	int8_t nextElevatorStop = building.elevator.currentFloor;	// Initialize next stop at current floor
 
-	// Determine difference between floors (current vs. destination) for each passenger
-	for (int8_t i = 0; i < ELEVATOR_MAX_CAPACITY; i++)
-	{
-		// Check that passenger exists
+	// Find number of open spots in elevator
+	int8_t openSpots = 3;
+	for (int8_t i = 0; i < ELEVATOR_MAX_CAPACITY; i++) {
 		if (building.elevator.passengers[i] != -1)
 		{
-			// Set the next floor stop as the passenger's destination closest to the current floor
-			if (abs(building.elevator.currentFloor - building.elevator.passengers[i]) < floorsAway)
+			openSpots--;
+		}
+	}
+
+	// Find number of departures on each floor
+	int8_t departureCount[BUILDING_HEIGHT];
+	for (int8_t f = 0; f < BUILDING_HEIGHT; f++)
+	{
+		for (int8_t j = 0; j < 2; j++)
+		{
+			if (building.floors[f].departures[j] != 1)
 			{
-				nextElevatorStop = building.elevator.passengers[i];
-				floorsAway = abs(building.elevator.currentFloor - nextElevatorStop);
+				departureCount[f]++;
 			}
 		}
-		// If there is an open spot in the elevator, check if there are any departures on a closer floor
-		else 
+	}
+
+	// If there are any passengers in the elevator, check how far their destination is from the current floor
+	if (openSpots < 3)
+	{
+		// Determine difference between floors (current vs. destination) for each passenger
+		for (int8_t i = 0; i < ELEVATOR_MAX_CAPACITY; i++)
 		{
-			// Iterate through floors to check for departures
-			for (int8_t f = 0; f < BUILDING_HEIGHT; f++)
+			// Check that passenger exists
+			if (building.elevator.passengers[i] != -1)
 			{
-				for (int8_t j = 0; j < 2; j++)
+				// Set the next floor stop as the passenger's destination closest to the current floor
+				if (abs(building.elevator.currentFloor - building.elevator.passengers[i]) < floorsAway)
 				{
-					if (building.floors[f].departures[j] != -1)
+					nextElevatorStop = building.elevator.passengers[i];
+					floorsAway = abs(building.elevator.currentFloor - nextElevatorStop);
+				}
+			}
+		}
+	}
+
+	// If there is an open spot in the elevator, check if there are any departures on a closer floor
+	if (openSpots != 0)
+	{
+		// Iterate through floors to check for departures
+		for (int8_t f = 0; f < BUILDING_HEIGHT; f++)
+		{
+			for (int8_t j = 0; j < 2; j++)
+			{
+				if (building.floors[f].departures[j] != -1)
+				{
+					if (abs(building.elevator.currentFloor - f) < floorsAway)
 					{
-						if (abs(building.elevator.currentFloor - f) < floorsAway)
-						{
-							nextElevatorStop = f;
-							floorsAway = abs(building.elevator.currentFloor - nextElevatorStop);
-						}
+						nextElevatorStop = f;
+						floorsAway = abs(building.elevator.currentFloor - nextElevatorStop);
 					}
 				}
 			}
 		}
-		
 	}
-	
-	printf("Next Stop = %d\n", nextElevatorStop);
+
 	return nextElevatorStop;
 }
 
@@ -109,8 +134,7 @@ int main(void)
 	initBuilding();
 
 	//Draw the initial state of the building, with elevator doors closed
-	// system("clear");
-	printf("\n\n\n");
+	system("clear");
 	drawBuilding(myBuilding,1);
 	fflush(stdout);
 	delay(1000);
@@ -125,8 +149,7 @@ int main(void)
 		moveElevator(&myBuilding.elevator);
 
 		//Draw the building, with elevator doors closed
-		// system("clear");
-		printf("\n\n\n");
+		system("clear");
 		drawBuilding(myBuilding,1);
 		fflush(stdout);
 		delay(1000);
@@ -135,8 +158,7 @@ int main(void)
 		if(myBuilding.elevator.currentFloor == myBuilding.elevator.nextStop)
 		{
 			//Redraw the building, with elevator doors open
-			// system("clear");
-			printf("\n\n\n");
+			system("clear");
 			drawBuilding(myBuilding,0);
 			fflush(stdout);
 			delay(1000);
@@ -146,16 +168,14 @@ int main(void)
 			stopElevator(&myBuilding);
 
 			//Redraw the building, with elevator doors open, showing the change
-			// system("clear");
-			printf("\n\n\n");
+			system("clear");
 			drawBuilding(myBuilding,0);
 			fflush(stdout);
 			delay(1000);
 			i++;
 
 			//Redraw the building, with elevator doors closed
-			// system("clear");
-			printf("\n\n\n");
+			system("clear");
 			drawBuilding(myBuilding,1);
 			fflush(stdout);
 			delay(1000);
