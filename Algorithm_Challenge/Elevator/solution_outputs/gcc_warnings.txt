@@ -1,0 +1,17 @@
+smoffat@irbt-8793m Elevator % gcc elevator_problem.c -o elevator_problem 
+In file included from elevator_problem.c:16:
+./elevator_problem.h:52:1: warning: return type of 'main' is not 'int' [-Wmain-return-type]
+void main(void); //Main function to run the elevator simulation
+^
+./elevator_problem.h:52:1: note: change return type to 'int'
+void main(void); //Main function to run the elevator simulation
+^~~~
+int
+elevator_problem.c:64:1: warning: return type of 'main' is not 'int' [-Wmain-return-type]
+void main(void)
+^
+elevator_problem.c:64:1: note: change return type to 'int'
+void main(void)
+^~~~
+int
+2 warnings generated.
