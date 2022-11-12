@@ -23,6 +23,7 @@
 // Variable(s)
 //****************************************************************************
 struct intersection_s myIntersection;
+static int8_t t = 0;
 
 //****************************************************************************
 // Private Function Prototype(s):
@@ -112,7 +113,7 @@ static void initIntersection(void)
 
 static char * setHorizantalTrafficLight(struct intersection_s intersection)
 {
-	int8_t t = 0;
+	
 	char * currentColor = intersection.horizantalTrafficColor;
 	char * newColor = currentColor;
 	traffic_light_colors_t currentColorEnum = -1;
@@ -131,6 +132,7 @@ static char * setHorizantalTrafficLight(struct intersection_s intersection)
 	}
 
 	t++;
+	printf("horizantal t = %d\n",t);
 
 	int8_t horizantalWait = intersection.eastboundCars.carsWaitingAtIntersection + intersection.westboundCars.carsWaitingAtIntersection;
 	int8_t verticalWait = intersection.northboundCars.carsWaitingAtIntersection + intersection.southboundCars.carsWaitingAtIntersection;
@@ -168,7 +170,7 @@ static char * setHorizantalTrafficLight(struct intersection_s intersection)
 
 static char * setVerticalTrafficLight(struct intersection_s intersection)
 {
-	int8_t t = 0;
+	
 	char * currentColor = intersection.verticalTrafficColor;
 	char * newColor = currentColor;
 	traffic_light_colors_t currentColorEnum = -1;
@@ -187,7 +189,7 @@ static char * setVerticalTrafficLight(struct intersection_s intersection)
 	}
 
 	t++;
-	printf("%d\n",t);
+	printf("vertical t = %d\n",t);
 
 	int8_t horizantalWait = intersection.eastboundCars.carsWaitingAtIntersection + intersection.westboundCars.carsWaitingAtIntersection;
 	int8_t verticalWait = intersection.northboundCars.carsWaitingAtIntersection + intersection.southboundCars.carsWaitingAtIntersection;
