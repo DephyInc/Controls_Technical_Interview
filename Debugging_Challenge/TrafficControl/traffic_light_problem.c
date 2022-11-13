@@ -24,7 +24,9 @@
 //****************************************************************************
 struct intersection_s myIntersection;
 static int8_t th = 0;	// This variable will be used to track how long the horizontal traffic light has spent in its current color
+static int8_t th_0 = 0; // This variable will be used to track how long there has been 0 cars waiting horizontally when the light is green
 static int8_t tv = 0;	// This variable will be used to track how long the vertical traffic light has spent in its current color
+static int8_t tv_0 = 0; // This variable will be used to track how long there has been 0 cars waiting vertically when the light is green
 
 //****************************************************************************
 // Private Function Prototype(s):
@@ -84,7 +86,7 @@ int main(void)
 		if(myIntersection.northboundCars.carsThatHaveLeft == 10 && myIntersection.southboundCars.carsThatHaveLeft == 10 && myIntersection.westboundCars.carsThatHaveLeft == 10 && myIntersection.eastboundCars.carsThatHaveLeft == 10)
 		{
 			int16_t totalWaitTime = myIntersection.northboundCars.timeWaiting + myIntersection.southboundCars.timeWaiting + myIntersection.westboundCars.timeWaiting + myIntersection.eastboundCars.timeWaiting;
-			printf("SUCCESS: You got all the cars through! The total wait time was: %i seconds!\n", totalWaitTime);
+			printf("SUCCESS: You got all the cars through in %i/120 seconds! The total wait time was: %i seconds!\n", i, totalWaitTime);
 			return 0;
 		}
 	}
@@ -135,8 +137,16 @@ static char * setHorizantalTrafficLight(struct intersection_s intersection)
 	}
 
 	// Count of cars waiting in each direction
-	int8_t horizantalWait = intersection.eastboundCars.carsWaitingAtIntersection + intersection.westboundCars.carsWaitingAtIntersection;
-	int8_t verticalWait = intersection.northboundCars.carsWaitingAtIntersection + intersection.southboundCars.carsWaitingAtIntersection;
+	int8_t horizantalWaitCars = intersection.eastboundCars.carsWaitingAtIntersection + intersection.westboundCars.carsWaitingAtIntersection;
+	int8_t verticalWaitCars = intersection.northboundCars.carsWaitingAtIntersection + intersection.southboundCars.carsWaitingAtIntersection;
+
+	// Total waiting time for each direction
+	int16_t horizantalWaitTime = intersection.eastboundCars.timeWaiting + intersection.westboundCars.timeWaiting;
+	int16_t verticalWaitTime = intersection.northboundCars.timeWaiting + intersection.southboundCars.timeWaiting;
+
+	// Total cars that have made it through in each direction
+	int8_t horizantalDoneCars = intersection.eastboundCars.carsThatHaveLeft + intersection.westboundCars.carsThatHaveLeft;
+	int8_t verticalDoneCars = intersection.northboundCars.carsThatHaveLeft + intersection.southboundCars.carsThatHaveLeft;
 
 	// Determine new light color (if light changes, reset t to 0)
 	switch(currentColorEnum)
@@ -146,35 +156,65 @@ static char * setHorizantalTrafficLight(struct intersection_s intersection)
 		//		- there are more cars waiting horizontally than vertically
 		//		- the vertical light is red (we don't want any crashes!)
 		case RED:
-			if((horizantalWait >= verticalWait) && (strcmp(intersection.verticalTrafficColor,"R") == 0))
+			if((horizantalWaitTime >= verticalWaitTime) && (strcmp(intersection.verticalTrafficColor,"R") == 0))
 			{
 				newColor = "G";
 				th = 0;
+				th_0 = 0;
+			}
+			if ((horizantalWaitCars == 0 && verticalWaitCars != 0) || horizantalDoneCars == 20)
+			{
+				newColor = "R";
+			}
+			else if ((horizantalWaitCars != 0 || verticalDoneCars == 20) && (strcmp(intersection.verticalTrafficColor,"R") == 0))
+			{
+				newColor = "G";
+				th = 0;
+				th_0 = 0;
 			}
 			break;
 		// Change light from GREEN to YELLOW if:
 		// 		- the horizontal light is green
-		//		- there are more cars waiting vertically OR the light has been green for more than 10 seconds
+		//		- there are more cars waiting vertically OR the light has been green for more than 10 seconds OR there are no cars waiting horizontally
 		case GREEN:
-			if((horizantalWait < verticalWait) || th > 10)
+			if((horizantalWaitTime < verticalWaitTime) || th > 10)
 			{
 				newColor = "Y";
 				th = 0;
+			}
+			if (verticalDoneCars == 20)
+			{
+				newColor = "G";
+			}
+			else if (horizantalWaitCars == 0)
+			{
+				th_0++;
+				if (th_0 > 1 && verticalWaitCars != 0)
+				{
+					newColor = "Y";
+					th = 0;
+					th_0 = 0;
+				}
+			} else
+			{
+				th_0 = 0;
 			}
 			break;
 		// Change the light from YELLOW to RED if:
 		//		- the horizontal light has been yellow for at least 1 second
 		case YELLOW:
-			if(th > 1)
+			if(th > 0)
 			{
 				newColor = "R";
 				th = 0;
+				th_0 = 0;
 			}
 			break;
 		// Set default case to RED to minimize risk of crashes
 		default:
 			newColor = "R";
 			th = 0;	
+			th_0 = 0;
 	}
 
 	return newColor;
@@ -203,46 +243,85 @@ static char * setVerticalTrafficLight(struct intersection_s intersection)
 	}
 
 	// Count of cars waiting in each direction
-	int8_t horizantalWait = intersection.eastboundCars.carsWaitingAtIntersection + intersection.westboundCars.carsWaitingAtIntersection;
-	int8_t verticalWait = intersection.northboundCars.carsWaitingAtIntersection + intersection.southboundCars.carsWaitingAtIntersection;
+	int8_t horizantalWaitCars = intersection.eastboundCars.carsWaitingAtIntersection + intersection.westboundCars.carsWaitingAtIntersection;
+	int8_t verticalWaitCars = intersection.northboundCars.carsWaitingAtIntersection + intersection.southboundCars.carsWaitingAtIntersection;
+
+	// Total waiting time for each direction
+	int16_t horizantalWaitTime = intersection.eastboundCars.timeWaiting + intersection.westboundCars.timeWaiting;
+	int16_t verticalWaitTime = intersection.northboundCars.timeWaiting + intersection.southboundCars.timeWaiting;
+
+	// Total cars that have made it through in each direction
+	int8_t horizantalDoneCars = intersection.eastboundCars.carsThatHaveLeft + intersection.westboundCars.carsThatHaveLeft;
+	int8_t verticalDoneCars = intersection.northboundCars.carsThatHaveLeft + intersection.southboundCars.carsThatHaveLeft;
 	
 	// Determine new light color (if light changes, reset t to 0)
 	switch(currentColorEnum)
 	{
 		// Change light from RED to GREEN if:
-		// 		- the horizontal light is red
-		//		- there are more cars waiting horizontally than vertically
+		// 		- the vertical light is red
+		//		- there are more cars waiting vertically than horizontally
 		//		- the vertical light is red (we don't want any crashes!)
 		case RED:
-			if((horizantalWait < verticalWait) && (strcmp(intersection.horizantalTrafficColor,"R") == 0))
+			if((verticalWaitTime > horizantalWaitTime) && (strcmp(intersection.horizantalTrafficColor,"R") == 0))
 			{
 				newColor = "G";
 				tv = 0;
+				tv_0 = 0;
+			}
+			if ((verticalWaitCars == 0 && horizantalWaitCars != 0) || verticalDoneCars == 20)
+			{
+				newColor = "R";
+			}
+			else if ((verticalWaitCars != 0 || horizantalDoneCars == 20) && (strcmp(intersection.horizantalTrafficColor,"R") == 0))
+			{
+				newColor = "G";
+				tv = 0;
+				tv_0 = 0;
 			}
 			break;
 		// Change light from GREEN to YELLOW if:
-		// 		- the horizontal light is green
-		//		- there are more cars waiting vertically OR the light has been green for more than 10 seconds
+		// 		- the vertical light is green
+		//		- there are more cars waiting horizontally OR the light has been green for more than 10 seconds OR there are no cars waiting vertically
 		case GREEN:
-			if((horizantalWait >= verticalWait) || tv > 10)
+			if((verticalWaitTime <= horizantalWaitTime) || tv > 10)
 			{
 				newColor = "Y";
 				tv = 0;
 			}
+			if (horizantalDoneCars == 20)
+			{
+				newColor = "G";
+			}
+			else if (verticalWaitCars == 0)
+			{
+				tv_0++;
+				if (tv_0 > 1 && horizantalWaitCars != 0)
+				{
+					newColor = "Y";
+					tv = 0;
+					tv_0 = 0;
+				}
+			} else
+			{
+				tv_0 = 0;
+			}
+			
 			break;
 		// Change the light from YELLOW to RED if:
-		//		- the horizontal light has been yellow for at least 1 second
+		//		- the vertical light has been yellow for at least 1 second
 		case YELLOW:
-			if(tv > 1)
+			if(tv > 0)
 			{
 				newColor = "R";
 				tv = 0;
+				tv_0 = 0;
 			}
 			break;
 		// Set default case to RED to minimize risk of crashes
 		default:
 			newColor = "R";
 			tv = 0;
+			tv_0 = 0;
 	}
 
 	return newColor;
