@@ -151,21 +151,30 @@ static char * setHorizantalTrafficLight(struct intersection_s intersection)
 	// Determine new light color (if light changes, reset t to 0)
 	switch(currentColorEnum)
 	{
-		// Change light from RED to GREEN if:
-		// 		- the horizontal light is red
-		//		- there are more cars waiting horizontally than vertically
-		//		- the vertical light is red (we don't want any crashes!)
+		/*** HORIZONTAL LIGHT IS RED ***/
 		case RED:
+			// Change light from RED to GREEN if:
+			//		- the horizontal cars have been waiting for longer than the vertical cars
+			//		- the vertical light is red (we don't want any crashes!)
 			if((horizantalWaitTime >= verticalWaitTime) && (strcmp(intersection.verticalTrafficColor,"R") == 0))
 			{
 				newColor = "G";
 				th = 0;
 				th_0 = 0;
 			}
+
+			// HOWEVER
+
+			// Keep the light RED if:
+			//		- there are 0 cars waiting horizontally and nonzero cars waiting vertically
+			//		- OR if the horizontal cars that have made it through the intersection has already reached 20
 			if ((horizantalWaitCars == 0 && verticalWaitCars != 0) || horizantalDoneCars == 20)
 			{
 				newColor = "R";
 			}
+			// Light can proceed to GREEN if:
+			//		- there are cars waiting horizontally OR vertical is done at 20
+			//		- the vertical light is red
 			else if ((horizantalWaitCars != 0 || verticalDoneCars == 20) && (strcmp(intersection.verticalTrafficColor,"R") == 0))
 			{
 				newColor = "G";
@@ -173,22 +182,32 @@ static char * setHorizantalTrafficLight(struct intersection_s intersection)
 				th_0 = 0;
 			}
 			break;
-		// Change light from GREEN to YELLOW if:
-		// 		- the horizontal light is green
-		//		- there are more cars waiting vertically OR the light has been green for more than 10 seconds OR there are no cars waiting horizontally
+
+		/*** HORIZONTAL LIGHT IS GREEN ***/
 		case GREEN:
+			// Change light from GREEN to YELLOW if:
+			//		- there are more cars waiting vertically
+			//		- OR the light has been green for more than 10 seconds
 			if((horizantalWaitTime < verticalWaitTime) || th > 10)
 			{
 				newColor = "Y";
 				th = 0;
 			}
+
+			// HOWEVER
+
+			// Keep light at GREEN if:
+			//		- the cars crossing vertically are done at 20
 			if (verticalDoneCars == 20)
 			{
 				newColor = "G";
 			}
+			// Light can proceed to YELLOW if:
+			//		- there have been no cars waiting horizontally for at least 1 second
+			//		- there are nonzero cars waiting vertically
 			else if (horizantalWaitCars == 0)
 			{
-				th_0++;
+				th_0++;	// Increment time that there has been 0 cars waiting horizontally
 				if (th_0 > 1 && verticalWaitCars != 0)
 				{
 					newColor = "Y";
@@ -197,12 +216,14 @@ static char * setHorizantalTrafficLight(struct intersection_s intersection)
 				}
 			} else
 			{
-				th_0 = 0;
+				th_0 = 0;	// Reset time that there has been 0 cars due to light change
 			}
 			break;
-		// Change the light from YELLOW to RED if:
-		//		- the horizontal light has been yellow for at least 1 second
+
+		/*** HORIZONTAL LIGHT IS YELLOW ***/
 		case YELLOW:
+			// Change the light from YELLOW to RED if:
+			//		- the horizontal light has been yellow for at least 1 second
 			if(th > 0)
 			{
 				newColor = "R";
@@ -257,21 +278,30 @@ static char * setVerticalTrafficLight(struct intersection_s intersection)
 	// Determine new light color (if light changes, reset t to 0)
 	switch(currentColorEnum)
 	{
-		// Change light from RED to GREEN if:
-		// 		- the vertical light is red
-		//		- there are more cars waiting vertically than horizontally
-		//		- the vertical light is red (we don't want any crashes!)
+		/*** VERTICAL LIGHT IS RED ***/
 		case RED:
+			// Change light from RED to GREEN if:
+			//		- the vertical cars have been waiting for longer than the horizontal cars
+			//		- the horizontal light is red (we don't want any crashes!)
 			if((verticalWaitTime > horizantalWaitTime) && (strcmp(intersection.horizantalTrafficColor,"R") == 0))
 			{
 				newColor = "G";
 				tv = 0;
 				tv_0 = 0;
 			}
+
+			// HOWEVER
+
+			// Keep the light RED if:
+			//		- there are 0 cars waiting vertically and nonzero cars waiting horizontally
+			//		- OR if the vertical cars that have made it through the intersection has already reached 20
 			if ((verticalWaitCars == 0 && horizantalWaitCars != 0) || verticalDoneCars == 20)
 			{
 				newColor = "R";
 			}
+			// Light can proceed to GREEN if:
+			//		- there are cars waiting vertically OR horizontal is done at 20
+			//		- the horizontal light is red
 			else if ((verticalWaitCars != 0 || horizantalDoneCars == 20) && (strcmp(intersection.horizantalTrafficColor,"R") == 0))
 			{
 				newColor = "G";
@@ -279,22 +309,32 @@ static char * setVerticalTrafficLight(struct intersection_s intersection)
 				tv_0 = 0;
 			}
 			break;
-		// Change light from GREEN to YELLOW if:
-		// 		- the vertical light is green
-		//		- there are more cars waiting horizontally OR the light has been green for more than 10 seconds OR there are no cars waiting vertically
+			
+		/*** VERTICAL LIGHT IS GREEN ***/
 		case GREEN:
+			// Change light from GREEN to YELLOW if:
+			//		- there are more cars waiting horizontally
+			//		- OR the light has been green for more than 10 seconds
 			if((verticalWaitTime <= horizantalWaitTime) || tv > 10)
 			{
 				newColor = "Y";
 				tv = 0;
 			}
+
+			// HOWEVER
+
+			// Keep light at GREEN if:
+			//		- the cars crossing horizontally are done at 20
 			if (horizantalDoneCars == 20)
 			{
 				newColor = "G";
 			}
+			// Light can proceed to YELLOW if:
+			//		- there have been no cars waiting vertically for at least 1 second
+			//		- there are nonzero cars waiting horizontally
 			else if (verticalWaitCars == 0)
 			{
-				tv_0++;
+				tv_0++;	// Increment time that there has been 0 cars waiting horizontally
 				if (tv_0 > 1 && horizantalWaitCars != 0)
 				{
 					newColor = "Y";
@@ -303,13 +343,15 @@ static char * setVerticalTrafficLight(struct intersection_s intersection)
 				}
 			} else
 			{
-				tv_0 = 0;
+				tv_0 = 0;	// Reset time that there has been 0 cars due to light change
 			}
 			
 			break;
-		// Change the light from YELLOW to RED if:
-		//		- the vertical light has been yellow for at least 1 second
+
+		/*** VERTICAL LIGHT IS YELLOW ***/
 		case YELLOW:
+			// Change the light from YELLOW to RED if:
+			//		- the vertical light has been yellow for at least 1 second
 			if(tv > 0)
 			{
 				newColor = "R";
