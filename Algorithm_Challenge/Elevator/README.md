@@ -39,7 +39,33 @@ Candidate Action Items:
   above function, please do not edit the code that's already in the files, unless you are extremely certain that 
   there's a bug in the code.
 - Briefly describe your implementation (1-3 sentences).
-  - ADD YOUR ANSWER HERE
+
+***
+### **Solution - Shannon Moffat**
+
+I built up my algorithm in steps to progressively improve the efficiency, as follows:
+
+1. Iterate through the passengers on the elevator, and set the next elevator stop as the destination that is closest to the current floor
+  * This, however did not account for whether the elevator was empty, so it would not necessarily reach all remaining departures
+2. If the elevator is empty, iterate through the floors and their departures, and set the next elevator stop as the closest floor that still has departures
+  * We can conclude that if there are no passengers on the elevator, and no more departures, then everyone has arrived
+  * We know that we will always be able to bring every departure to their arrival, but this is not the most efficient and may not be achieved in the allotted 60 seconds
+3. If there are any open spots on the elevator, check if there are any departures on a floor closer than the closest passenger's destination
+  * This increases our efficiency to reliably achieve the goal in 60 seconds
+  * However, there still may exist some edge cases that will go overtime due to the extra time it takes to stop/load the elevator, which we may do more frequently here since we are only checking for at least one open spot on the elevator
+
+Below is a statistical analysis of the time to achieve the goal after running the simulation 30 times.
+
+|N|Statistics|Min|Max|Mean|Median|Standard Deviation|
+|-|-|-|-|-|-|-|
+|30|(in seconds)|37|55|46|47|4.68|
+
+This solution is reliable in getting all of the passengers to their destinations in under 60 seconds, and is reasonably efficient. There are further improvements that could be made or other methods to be explored, such as prioritizing departures that are far away from their destination, taking the direction of the elevator into account, etc. Also, in the real world we would want to make sure that no one passenger is on the elevator for too long before reaching their floor.
+
+In the folder */solution_outputs*, I have saved a few text files with the output of my algorithm solution. One shows the elevator problem achieved in just 38 seconds, while the other shows a more "unlucky" instance that took 59 seconds to achieve.
+
+I did edit the `main` function, just to change the return type to `int` as noted when compiling in GCC. I saved a text file with that output for your reference.
+***
 
 Don't forget; we are interested in both your solution and your thought process.
 
