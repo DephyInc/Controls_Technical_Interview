@@ -24,6 +24,21 @@
 #define ELEVATOR_MAX_CAPACITY	3
 #define BUILDING_HEIGHT			5
 
+// Boolean enum
+typedef enum
+{
+	FALSE = 0,
+	TRUE
+} boolean_t;
+
+// Enum for direction of movement of elevator
+typedef enum
+{ 
+	UP = 0, 
+	DOWN, 
+	NONE
+} elevator_direction_t;
+
 //****************************************************************************
 // Structures(s)
 //****************************************************************************

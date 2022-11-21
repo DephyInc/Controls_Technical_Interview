@@ -39,7 +39,7 @@ Candidate Action Items:
   above function, please do not edit the code that's already in the files, unless you are extremely certain that 
   there's a bug in the code.
 - Briefly describe your implementation (1-3 sentences).
-  - ADD YOUR ANSWER HERE
+  - The core logic for my implementation is inspired from my personal experience with riding elevators: if the elevator is moving in a given direction (up or down), it should continue moving in that direction, dropping off passengers along the way when their floor is reached, as it continues in that direction. The elevator only swaps directions once the current direction is no longer valid for any passengers on board, meaning that the direction of travel must be swapped for any passengers on board to reach their destination. The final edge case I ran into was how to handle the situation of the elevator being empty but not all passengers have been delivered, which was solved by searching the floors for any remaining passengers when the elevator is found to be empty.
 
 Don't forget; we are interested in both your solution and your thought process.
 

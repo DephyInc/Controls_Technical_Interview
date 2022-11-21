@@ -24,6 +24,9 @@
 //****************************************************************************
 struct building_s myBuilding;
 
+// Variable to hold direction of movement of elevator, initialize to 'NONE'.
+static elevator_direction_t elevatorDir = NONE;
+
 //****************************************************************************
 // Private Function Prototype(s):
 //****************************************************************************
@@ -36,19 +39,274 @@ static void drawFloor(struct floor_s floor, int8_t floorNumber, struct elevator_
 static void drawElevator(struct elevator_s elevator, int8_t doorStatus);
 static void delay(int16_t ms);
 
+static elevator_direction_t determineInitialDirection(struct building_s * building);
+static boolean_t isElevatorEmpty(struct building_s * building);
+static int8_t findClosestFloorWithDepartures(struct building_s * building);
+static boolean_t checkFloorForDepartures(struct building_s * building, int8_t floor);
+static boolean_t continueInCurDirection(struct building_s * building, elevator_direction_t curElevatorDir);
+static elevator_direction_t swapElevatorDirection(elevator_direction_t curElevatorDir);
+static int8_t findClosestRequestedHigherFloor(struct building_s * building);
+static int8_t findClosestRequestedLowerFloor(struct building_s * building);
+
 //****************************************************************************
 // Functions You (the Interviewee) Should Edit:
 //****************************************************************************
 
-//Returns the floor the elevator should STOP at next
-//To stop at a floor means to open the doors and let passengers on and off. It 
-//is possible to pass through a floor without stopping there.
-//Note: The output should be a number between 0 and (BUILDING_HEIGHT-1), inclusive
+/**
+ * @brief Returns the floor the elevator should STOP at next. To stop at a floor means 
+ * 		  to open the doors and let passengers on and off. It is possible to pass through
+ * 		  a floor without stopping there.
+ * 		  
+ * 		  Note: The output should be a number between 0 and (BUILDING_HEIGHT-1), inclusive
+ * 
+ * @param building struct holding the building and elevator information 
+ * @return int8_t a number between 0 and (BUILDING_HEIGHT-1), inclusive, indicating the next
+ * 		   elevator stop
+ */
 static int8_t setNextElevatorStop(struct building_s building)
 {
-	return 0;
+	// If we are just starting the simulation, determining the first direction to move in
+	if (elevatorDir == NONE)
+	{
+		elevatorDir = determineInitialDirection(&building);
+	}
+
+	// Else if we are not just starting the simulation and the elevator is empty, send the
+	// elevator to the closest floor with passengers waiting to be picked up
+	else if(isElevatorEmpty(&building) == TRUE)
+	{
+		return findClosestFloorWithDepartures(&building);
+	}
+
+	// Else, determine if the elevator should continue in the same direction or swap directions
+	else
+	{
+		elevatorDir = (continueInCurDirection(&building, elevatorDir) == TRUE)
+			? elevatorDir : swapElevatorDirection(elevatorDir);
+	}
+
+	// Return the closest requested floor based on the elevator direction. If direction is NONE,
+	// return current floor.
+	if (elevatorDir == UP)
+		return findClosestRequestedHigherFloor(&building);
+	else if (elevatorDir == DOWN)
+		return findClosestRequestedLowerFloor(&building);
+	else
+		return building.elevator.currentFloor;
 }
 
+/**
+ * @brief Function used for determining the initial direction of the elevator
+ * 
+ * @param building pointer to building object
+ * @return int8_t floor number for initial floor request
+ */
+elevator_direction_t determineInitialDirection(struct building_s* building)
+{
+	// Iterate until we find a passenger
+	for (int8_t i = 0; i < ELEVATOR_MAX_CAPACITY; i++)
+	{
+		if (building->elevator.passengers[i] != -1)
+		{
+			// We are taking the first passenger we see in the 'passengers' array as the
+			// first priority for determining direction
+			if(building->elevator.passengers[i] > building->elevator.currentFloor)
+				return UP;
+			else
+				return DOWN;
+		}
+	}
+
+	// If no passengers found, we have not yet loaded anyone onboard, return NONE as default
+	return NONE;
+}
+
+/**
+ * @brief Function for determining if the elevator is empty
+ * 
+ * @param building pointer to building object
+ * @return boolean_t TRUE if no passengers onboard
+ */
+boolean_t isElevatorEmpty(struct building_s * building)
+{
+	// Iterate until we find a passenger
+	for (int8_t i = 0; i < ELEVATOR_MAX_CAPACITY; i++)
+	{
+		if (building->elevator.passengers[i] != -1)
+			return FALSE;
+	}
+
+	// No passengers found, elevator is empty
+	return TRUE;
+}
+
+/**
+ * @brief Function for finding the closest floor with departures waiting to be picked up
+ * 
+ * @param building pointer to building object
+ * @return int8_t closest floor with departures remaining
+ */
+int8_t findClosestFloorWithDepartures(struct building_s * building)
+{
+	// Variables to hold the current closest above and below floor to check for departures
+	int8_t aboveFloor = building->elevator.currentFloor + 1;
+	int8_t belowFloor = building->elevator.currentFloor - 1;
+
+	boolean_t allFloorsExplored = FALSE;
+
+	// Continue until we have explored all floors
+	while(!allFloorsExplored)
+	{
+		// If the current closest above floor is valid and there are departures waiting to
+		// be picked up, set as commanded floor for elevator
+		if ((aboveFloor < BUILDING_HEIGHT) && checkFloorForDepartures(building, aboveFloor))
+		{
+			elevatorDir = UP;
+			return aboveFloor;
+		}
+
+		// Else if the current closest below floor is valid and there are departures waiting to
+		// be picked up, set as commanded floor for elevator
+		else if ((belowFloor >= 0) && checkFloorForDepartures(building, belowFloor))
+		{
+			elevatorDir = DOWN;
+			return belowFloor;
+		}
+		
+		// Increment floor counters and determine if we've explored all floors
+		if(++aboveFloor >= BUILDING_HEIGHT && --belowFloor < 0)
+		{
+			allFloorsExplored = TRUE;
+		}
+	}
+
+	// No departures remaining, do not move elevator
+	return building->elevator.currentFloor;
+}
+
+/**
+ * @brief Function for checking if a desired floor has any departures waiting to be picked up
+ * 
+ * @param building pointer to building object
+ * @param floor desired floor
+ * @return boolean_t TRUE if the desired floor has departures waiting to be picked up
+ */
+boolean_t checkFloorForDepartures(struct building_s * building, int8_t floor)
+{
+	// Extract the desired floor
+	struct floor_s desiredFloor = building->floors[floor];
+
+	// Check to see if any departures are remaining on the desired floor
+	for(int8_t j = 0; j < 2; j++)
+	{
+		if(desiredFloor.departures[j] != -1)
+			return TRUE;
+	}
+
+	return FALSE;
+}
+
+/**
+ * @brief Function for determining if the elevator should continue moving in its current
+ * 		  direction. It accomplishes this by checking to see if there are any passengers
+ * 		  in the elevator whose desired direction is the same as the current elevator direction.
+ * 
+ * @param building pointer to building object
+ * @param elevatorDir current direction of elevator
+ * @return boolean_t TRUE if the elevator should continue in its current direction
+ */
+boolean_t continueInCurDirection(struct building_s * building, elevator_direction_t curElevatorDir)
+{
+	// Iterate through passengers
+	for (int8_t i = 0; i < ELEVATOR_MAX_CAPACITY; i++)
+	{
+		if (building->elevator.passengers[i] != -1)
+		{	
+			// Determine the passenger's desired direction and compare against elevator direction
+			elevator_direction_t passengerDesiredDir = 
+				(building->elevator.passengers[i] > building->elevator.currentFloor) ? UP : DOWN;
+
+			if(passengerDesiredDir == curElevatorDir)
+				return TRUE;
+		}
+	}
+
+	return FALSE;
+}
+
+/**
+ * @brief Function for swapping the direction of the elevator
+ * 
+ * @param curElevatorDir current direction of the elevator
+ * @return elevator_direction_t swapped direction of the elevator
+ */
+elevator_direction_t swapElevatorDirection(elevator_direction_t curElevatorDir)
+{
+	if(curElevatorDir == UP)
+		return DOWN;
+	else
+		return UP;
+}
+
+/**
+ * @brief Finds the closest requested higher floor among the passengers on board. That is,
+ * 		  amongst the requested floors above the elevator's current floor, find the one that
+ * 		  is closest to the current floor.
+ * 
+ * @param building pointer to building object
+ * @return int8_t requested higher floor that is closest to the elevator's current floor
+ */
+int8_t findClosestRequestedHigherFloor(struct building_s * building)
+{
+	// Variable to hold the requested higher floor that is closest to the current floor
+	int8_t closestRequestedHigherFloor = BUILDING_HEIGHT - 1;
+
+	// Iterate through passengers
+	for (int8_t i = 0; i < ELEVATOR_MAX_CAPACITY; i++)
+	{
+		// If the current passenger wishes to go to a higher floor, but one that is closer
+		// than the previous recorded closestRequestedHigherFloor, set it as the
+		// closestRequestedHigherFloor
+		if (building->elevator.passengers[i] != -1 && 
+				building->elevator.passengers[i] > building->elevator.currentFloor &&
+				building->elevator.passengers[i] < closestRequestedHigherFloor)
+		{
+			closestRequestedHigherFloor = building->elevator.passengers[i];
+		}
+	}
+
+	return closestRequestedHigherFloor;
+}
+
+/**
+ * @brief Finds the closest requested lower floor among the passengers on board. That is,
+ * 		  amongst the requested floors below the elevator's current floor, find the one that
+ * 		  is closest to the current floor.
+ * 
+ * @param building pointer to building object
+ * @return int8_t requested lower floor that is closest to the elevator's current floor
+ */
+int8_t findClosestRequestedLowerFloor(struct building_s * building)
+{
+	// Variable to hold the requested lower floor that is closest to the current floor
+	int8_t closestRequestedLowerFloor = 0;
+
+	// Iterate through passengers
+	for (int8_t i = 0; i < ELEVATOR_MAX_CAPACITY; i++)
+	{
+		// If the current passenger wishes to go to a lower floor, but one that is closer
+		// than the previous recorded closestRequestedLowerFloor, set it as the
+		// closestRequestedLowerFloor
+		if (building->elevator.passengers[i] != -1 && 
+				building->elevator.passengers[i] < building->elevator.currentFloor &&
+				building->elevator.passengers[i] > closestRequestedLowerFloor)
+		{
+			closestRequestedLowerFloor = building->elevator.passengers[i];
+		}
+	}
+
+	return closestRequestedLowerFloor;
+}
 
 //****************************************************************************
 //YOU CAN REVIEW THE CODE BELOW BUT DO NOT EDIT IT UNLESS YOU'RE 3000% SURE 

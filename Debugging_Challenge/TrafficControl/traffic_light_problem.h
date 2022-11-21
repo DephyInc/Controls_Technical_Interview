@@ -21,12 +21,6 @@
 //****************************************************************************
 // Definition(s)
 //****************************************************************************
-typedef enum
-{
-	RED = 0,
-	GREEN,
-	YELLOW
-} traffic_light_colors_t;
 
 //****************************************************************************
 // Structures(s)
@@ -39,7 +33,7 @@ struct lane_of_cars_s
 	int8_t carsThatHaveLeft;
 	
 	int8_t popularity;
-	int8_t timeWaiting;
+	int16_t timeWaiting;
 };
 
 struct intersection_s

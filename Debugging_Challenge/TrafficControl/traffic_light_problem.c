@@ -97,6 +97,10 @@ void main(void)
 // Private function(s):
 //****************************************************************************
 
+/**
+ * @brief Initializes the parameters of the intersection
+ * 
+ */
 static void initIntersection(void)
 {
 	myIntersection.horizantalTrafficColor = "R";
@@ -108,116 +112,124 @@ static void initIntersection(void)
 	myIntersection.southboundCars.popularity = 4;
 }
 
+/**
+ * @brief Set the new value of the east-west traffic light
+ * 
+ * @param intersection current value of intersection object
+ * @return char* new traffic light value
+ */
 static char * setHorizantalTrafficLight(struct intersection_s intersection)
 {
 	static int8_t t = 0;
 	char * currentColor = intersection.horizantalTrafficColor;
 	char * newColor = currentColor;
-	traffic_light_colors_t currentColorEnum = -1;
 
-	if(strcmp(currentColor,"R") == 0)
-	{
-		currentColorEnum = RED;
-	}
-	else if(strcmp(currentColor,"G") == 0)
-	{
-		currentColorEnum = GREEN;
+	// Determine the number of cars waiting in each direction
+	int8_t eastWestCarsWaiting = intersection.eastboundCars.carsWaitingAtIntersection + 
+				intersection.westboundCars.carsWaitingAtIntersection;
+	int8_t northSouthCarsWaiting = intersection.northboundCars.carsWaitingAtIntersection + 
+				intersection.southboundCars.carsWaitingAtIntersection;
+	
+	t++;
 
-		if(strcmp(currentColor,"Y") == 0)
+	if (strcmp(currentColor, "R") == 0) // traffic light is RED
+	{
+		// More cars are waiting in the horizontal direction, let them proceed, assuming its safe to do so
+		if ((eastWestCarsWaiting >= northSouthCarsWaiting) && (strcmp(intersection.verticalTrafficColor, "R") == 0))
 		{
-			currentColorEnum = YELLOW;
+			newColor = "G";
+			t = 0;
 		}
 	}
-
-	t++;
-	switch(currentColorEnum)
+	else if (strcmp(currentColor, "G") == 0) // traffic light is GREEN
 	{
-		case RED:
-			if((intersection.eastboundCars.carsWaitingAtIntersection + intersection.westboundCars.carsWaitingAtIntersection >= intersection.northboundCars.carsWaitingAtIntersection + intersection.southboundCars.carsWaitingAtIntersection) && (strcmp(intersection.verticalTrafficColor,"R") == 0))
-			{
-				newColor = "G";
-				t = 0;
-			}
-
-		case GREEN:
-			if((intersection.eastboundCars.carsWaitingAtIntersection + intersection.westboundCars.carsWaitingAtIntersection < intersection.northboundCars.carsWaitingAtIntersection + intersection.southboundCars.carsWaitingAtIntersection) || t > 10)
-			{
-				newColor = "Y";
-				t = 0;
-			}
-
-		case YELLOW:
-			if(t > 1)
-			{
-				newColor = "R";
-				t = 0;
-			}
-
-		default:
+		// More cars are waiting in the vertical direction, stop the horizontal flow to allow them to safely proceed
+		if ((eastWestCarsWaiting < northSouthCarsWaiting) || t > 10)
+		{
+			newColor = "Y";
+			t = 0;
+		}
+	}
+	else if (strcmp(currentColor, "Y") == 0) // traffic light is YELLOW
+	{
+		// If yellow light has given time for cars to stop
+		if (t > 1)
+		{
 			newColor = "R";
-			t = 0;	
+			t = 0;
+		}
+	}
+	else // traffic light is UNDEFINED
+	{
+		newColor = "R";
+		t = 0;
 	}
 
 	return newColor;
 }
 
+/**
+ * @brief Set the new value of the north-south traffic light
+ * 
+ * @param intersection current value of intersection object
+ * @return char* new traffic light value
+ */
 static char * setVerticalTrafficLight(struct intersection_s intersection)
 {
 	static int8_t t = 0;
 	char * currentColor = intersection.verticalTrafficColor;
 	char * newColor = currentColor;
-	traffic_light_colors_t currentColorEnum = -1;
 
-	if(strcmp(currentColor,"R") == 0)
+	// Determine the number of cars waiting in each direction
+	int8_t eastWestCarsWaiting = intersection.eastboundCars.carsWaitingAtIntersection + 
+				intersection.westboundCars.carsWaitingAtIntersection;
+	int8_t northSouthCarsWaiting = intersection.northboundCars.carsWaitingAtIntersection + 
+				intersection.southboundCars.carsWaitingAtIntersection;
+	
+	t++;
+
+	if (strcmp(currentColor, "R") == 0) // traffic light is RED
 	{
-		currentColorEnum = RED;
-
-		if(strcmp(currentColor,"G") == 0)
-		{	
-			currentColorEnum = GREEN;
+		// More cars are waiting in the vertical direction, let them proceed, assuming its safe to do so
+		if ((eastWestCarsWaiting < northSouthCarsWaiting) && (strcmp(intersection.horizantalTrafficColor, "R") == 0))
+		{
+			newColor = "G";
+			t = 0;
 		}
 	}
-	else if(strcmp(currentColor,"Y") == 0)
+	else if (strcmp(currentColor, "G") == 0) // traffic light is GREEN
 	{
-		currentColorEnum = YELLOW;
+		// More cars are waiting in the horizontal direction, stop the vertical flow to allow them to safely proceed
+		if ((eastWestCarsWaiting >= northSouthCarsWaiting) || t > 10)
+		{
+			newColor = "Y";
+			t = 0;
+		}
 	}
-
-	t++;
-	switch(currentColorEnum)
+	else if (strcmp(currentColor, "Y") == 0) // traffic light is YELLOW
 	{
-		case RED:
-			if((intersection.eastboundCars.carsWaitingAtIntersection + intersection.westboundCars.carsWaitingAtIntersection < intersection.northboundCars.carsWaitingAtIntersection + intersection.southboundCars.carsWaitingAtIntersection) && (strcmp(intersection.horizantalTrafficColor,"R") == 0))
-			{
-				newColor = "G";
-				t = 0;
-			}
-			break;
-
-		case GREEN:
-			if((intersection.eastboundCars.carsWaitingAtIntersection + intersection.westboundCars.carsWaitingAtIntersection >= intersection.northboundCars.carsWaitingAtIntersection + intersection.southboundCars.carsWaitingAtIntersection) || t > 10)
-			{
-				newColor = "Y";
-				t = 0;
-			}
-			break;
-
-		case YELLOW:
-			if(t > 1)
-			{
-				newColor = "R";
-				t = 0;
-			}
-			break;
-
-		default:
+		// If yellow light has given time for cars to stop
+		if (t > 1)
+		{
 			newColor = "R";
 			t = 0;
-			break;	
+		}
+	}
+	else // traffic light is UNDEFINED
+	{
+		newColor = "R";
+		t = 0;
 	}
 
 	return newColor;
 }
 
+/**
+ * @brief Advances the cars in a given lane
+ * 
+ * @param trafficColor current value of traffic light of interest
+ * @param lane pointer to lane_of_cars object
+ */
 static void advanceLane(char * trafficColor, struct lane_of_cars_s * lane)
 {
 	//Move any cars on the leaving side of the intersection into oblivion
@@ -415,6 +427,11 @@ static void drawEastboundLane(char * trafficColor, struct lane_of_cars_s eastbou
 	}
 }
 
+/**
+ * @brief Delays the simulation by a given number of milliseconds
+ * 
+ * @param ms number of ms to delay
+ */
 static void delay(int16_t ms)
 {
     clock_t startTime = clock();
@@ -422,11 +439,19 @@ static void delay(int16_t ms)
     while(clock() < startTime + ms);
 }
 
+/**
+ * @brief Checks whether a crash has occured in the intersection
+ * 
+ * @return int8_t 1 if crash occured, 0 otherwise
+ */
 static int8_t checkForCrashes(void)
 {
+	// Determine if there are any cars in the intersection from both horizontal and vertical flows.
+	// Non-zero value means there is at least one car in the intersection from that direction of flow.
 	int8_t isHorizantalCarInIntersection = (myIntersection.westboundCars.carsInIntersection | myIntersection.eastboundCars.carsInIntersection);
-	int8_t isVerticalCarInIntersection = (myIntersection.westboundCars.carsInIntersection | myIntersection.eastboundCars.carsInIntersection);
+	int8_t isVerticalCarInIntersection = (myIntersection.northboundCars.carsInIntersection | myIntersection.southboundCars.carsInIntersection);
 
+	// If there are cars in the intersection from both directions of flow, report a crash
 	if(isHorizantalCarInIntersection && isVerticalCarInIntersection){return 1;}
 	return 0;
 }
