@@ -2,10 +2,10 @@
 	[Project] Controls Technical Interview
 *****************************************************************************
 	[Lead developer] Rachel Harris, rharris at dephy dot com.
-	[Contributors] 
+	[Contributors]
 *****************************************************************************
-	[This file] elevator_problem: Moves an elevator through a building to get 
-	people to the correct floor in the least amount of time. 
+	[This file] elevator_problem: Moves an elevator through a building to get
+	people to the correct floor in the least amount of time.
 ****************************************************************************
 	[Created] 2022-11-07 | rharris | Initial creation
 ****************************************************************************/

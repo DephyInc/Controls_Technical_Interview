@@ -27,7 +27,7 @@ GCC install instructions for Linux/Ubuntu 22.04 - run the following in your comm
 ```bash
 sudo apt-get install -y git gcc build-essential
 ```
-	
+
 GCC install instructions for MacOS - run the following in your command terminal:
 
 ```

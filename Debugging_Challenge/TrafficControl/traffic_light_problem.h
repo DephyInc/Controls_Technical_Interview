@@ -2,10 +2,10 @@
 	[Project] Controls Technical Interview
 *****************************************************************************
 	[Lead developer] Rachel Harris, rharris at dephy dot com.
-	[Contributors] 
+	[Contributors]
 *****************************************************************************
-	[This file] traffic_light_problem: Changes the traffic light colors to 
-	move cars through an intersection while minimizing wait time at red lights. 
+	[This file] traffic_light_problem: Changes the traffic light colors to
+	move cars through an intersection while minimizing wait time at red lights.
 ****************************************************************************
 	[Created] 2022-11-04 | rharris | Initial creation
 ****************************************************************************/
@@ -37,7 +37,7 @@ struct lane_of_cars_s
 	int8_t carsInIntersection;
 	int8_t carsLeavingIntersection;
 	int8_t carsThatHaveLeft;
-	
+
 	int8_t popularity;
 	int8_t timeWaiting;
 };

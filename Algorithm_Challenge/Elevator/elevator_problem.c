@@ -2,10 +2,10 @@
 	[Project] Controls Technical Interview
 *****************************************************************************
 	[Lead developer] Rachel Harris, rharris at dephy dot com.
-	[Contributors] 
+	[Contributors]
 *****************************************************************************
-	[This file] elevator_problem: Moves an elevator through a building to get 
-	people to the correct floor in the least amount of time. 
+	[This file] elevator_problem: Moves an elevator through a building to get
+	people to the correct floor in the least amount of time.
 ****************************************************************************
 	[Created] 2022-11-07 | rharris | Initial creation
 ****************************************************************************/
@@ -41,7 +41,7 @@ static void delay(int16_t ms);
 //****************************************************************************
 
 //Returns the floor the elevator should STOP at next
-//To stop at a floor means to open the doors and let passengers on and off. It 
+//To stop at a floor means to open the doors and let passengers on and off. It
 //is possible to pass through a floor without stopping there.
 //Note: The output should be a number between 0 and (BUILDING_HEIGHT-1), inclusive
 static int8_t setNextElevatorStop(struct building_s building)
@@ -51,7 +51,7 @@ static int8_t setNextElevatorStop(struct building_s building)
 
 
 //****************************************************************************
-//YOU CAN REVIEW THE CODE BELOW BUT DO NOT EDIT IT UNLESS YOU'RE 3000% SURE 
+//YOU CAN REVIEW THE CODE BELOW BUT DO NOT EDIT IT UNLESS YOU'RE 3000% SURE
 //THERE'S A BUG IN MY CODE! (which admittedly, is possible)
 //****************************************************************************
 
@@ -183,7 +183,7 @@ static void stopElevator(struct building_s * building)
 	//Let out anyone who needs to get off
 	for(int8_t i = 0; i < ELEVATOR_MAX_CAPACITY; i++)
 	{
-		if(building->elevator.passengers[i] == building->elevator.currentFloor) 
+		if(building->elevator.passengers[i] == building->elevator.currentFloor)
 		{
 			building->floors[building->elevator.currentFloor].arrivals++;
 			building->elevator.passengers[i] = -1;
@@ -193,7 +193,7 @@ static void stopElevator(struct building_s * building)
 	//Let in anyone who needs to get on, but only if capacity allows
 	for(int8_t i = 0; i < ELEVATOR_MAX_CAPACITY; i++)
 	{
-		if(building->elevator.passengers[i] == -1) 
+		if(building->elevator.passengers[i] == -1)
 		{
 			for(int8_t j = 0; j < 2; j++)
 			{
@@ -222,7 +222,7 @@ static void drawFloor(struct floor_s floor, int8_t floorNumber, struct elevator_
 {
 
 	printf("FLOOR %i:          ", floorNumber);
-	
+
 	for(int8_t i = 0; i < 2; i++)
 	{
 		if(floor.departures[i] == -1){ printf(" "); }
@@ -259,7 +259,7 @@ static void delay(int16_t ms)
 {
     //Storing start time
     clock_t startTime = clock();
- 
+
     //Looping till required time is not achieved
     while(clock() < startTime + ms);
 }

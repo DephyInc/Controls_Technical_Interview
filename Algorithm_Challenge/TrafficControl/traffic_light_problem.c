@@ -2,10 +2,10 @@
 	[Project] Controls Technical Interview
 *****************************************************************************
 	[Lead developer] Rachel Harris, rharris at dephy dot com.
-	[Contributors] 
+	[Contributors]
 *****************************************************************************
-	[This file] traffic_light_problem: Changes the traffic light colors to 
-	move cars through an intersection while minimizing wait time at red lights. 
+	[This file] traffic_light_problem: Changes the traffic light colors to
+	move cars through an intersection while minimizing wait time at red lights.
 ****************************************************************************
 	[Created] 2022-11-04 | rharris | Initial creation
 ****************************************************************************/
@@ -43,7 +43,7 @@ static int8_t checkForCrashes(void);
 // Functions You (the Interviewee) Should Edit:
 //****************************************************************************
 
-//Returns the color of the traffic light for the eastbound and westbound lanes 
+//Returns the color of the traffic light for the eastbound and westbound lanes
 //of horizantal street given the current status of the intersection
 //Note: The output should be either "R", "Y", or "G"
 static char * setHorizantalTrafficLight(struct intersection_s intersection)
@@ -51,7 +51,7 @@ static char * setHorizantalTrafficLight(struct intersection_s intersection)
 	return "R";
 }
 
-//Returns the color of the traffic light for the northbound and southbound lanes 
+//Returns the color of the traffic light for the northbound and southbound lanes
 //of vertical street given the current status of the intersection
 //Note: The output should be either "R", "Y", or "G"
 static char * setVerticalTrafficLight(struct intersection_s intersection)
@@ -61,7 +61,7 @@ static char * setVerticalTrafficLight(struct intersection_s intersection)
 
 
 //****************************************************************************
-//YOU CAN REVIEW THE CODE BELOW BUT DO NOT EDIT IT UNLESS YOU'RE 3000% SURE 
+//YOU CAN REVIEW THE CODE BELOW BUT DO NOT EDIT IT UNLESS YOU'RE 3000% SURE
 //THERE'S A BUG IN MY CODE! (which admittedly, is possible)
 //****************************************************************************
 
@@ -166,7 +166,7 @@ static void advanceLane(char * trafficColor, struct lane_of_cars_s * lane)
 		int addCarToLane = rand();
 		if((addCarToLane % lane->popularity) == 0)
 		{
-			lane->carsWaitingAtIntersection++;	
+			lane->carsWaitingAtIntersection++;
 		}
 	}
 
@@ -337,7 +337,7 @@ static void delay(int16_t ms)
 {
     //Storing start time
     clock_t startTime = clock();
- 
+
     //Looping till required time is not achieved
     while(clock() < startTime + ms);
 }

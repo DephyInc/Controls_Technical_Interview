@@ -35,7 +35,7 @@ repos:
     hooks:
     -   id: pylint
         args:
-            - --disable=R0801
+            - --disable=R0801, C0103
             - --exit-zero
         additional_dependencies:
             - flexsea

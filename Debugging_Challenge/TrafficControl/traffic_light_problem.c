@@ -2,10 +2,10 @@
 	[Project] Controls Technical Interview
 *****************************************************************************
 	[Lead developer] Rachel Harris, rharris at dephy dot com.
-	[Contributors] 
+	[Contributors]
 *****************************************************************************
-	[This file] traffic_light_problem: Changes the traffic light colors to 
-	move cars through an intersection while minimizing wait time at red lights. 
+	[This file] traffic_light_problem: Changes the traffic light colors to
+	move cars through an intersection while minimizing wait time at red lights.
 ****************************************************************************
 	[Created] 2022-11-04 | rharris | Initial creation
 ****************************************************************************/
@@ -155,7 +155,7 @@ static char * setHorizantalTrafficLight(struct intersection_s intersection)
 
 		default:
 			newColor = "R";
-			t = 0;	
+			t = 0;
 	}
 
 	return newColor;
@@ -173,7 +173,7 @@ static char * setVerticalTrafficLight(struct intersection_s intersection)
 		currentColorEnum = RED;
 
 		if(strcmp(currentColor,"G") == 0)
-		{	
+		{
 			currentColorEnum = GREEN;
 		}
 	}
@@ -212,7 +212,7 @@ static char * setVerticalTrafficLight(struct intersection_s intersection)
 		default:
 			newColor = "R";
 			t = 0;
-			break;	
+			break;
 	}
 
 	return newColor;
@@ -248,7 +248,7 @@ static void advanceLane(char * trafficColor, struct lane_of_cars_s * lane)
 		int addCarToLane = rand();
 		if((addCarToLane % lane->popularity) == 0)
 		{
-			lane->carsWaitingAtIntersection++;	
+			lane->carsWaitingAtIntersection++;
 		}
 	}
 
@@ -418,7 +418,7 @@ static void drawEastboundLane(char * trafficColor, struct lane_of_cars_s eastbou
 static void delay(int16_t ms)
 {
     clock_t startTime = clock();
- 
+
     while(clock() < startTime + ms);
 }
 
