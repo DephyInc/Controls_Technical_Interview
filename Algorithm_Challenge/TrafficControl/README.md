@@ -1,17 +1,16 @@
 # Traffic Light Problem (1 hour)
 
-There's a busy traffic intersection outside your building. The roads at the intersection are horizantal street and vertical street. 
-You are an engineer with the department of transportation and you're trying to come up with a new traffic light pattern that 
-prevents cars from crashing in the intersection but also minimizes traffic jams. 
+There's a busy traffic intersection outside your building. The roads at the intersection are horizantal street and vertical street.
+You are an engineer with the department of transportation and you're trying to come up with a new traffic light pattern that prevents cars from crashing in the intersection but also minimizes traffic jams. 
 
-Your goal:
+## Your goal:
 - Get all the cars safely through the intersection in less than 2 minutes.
 - Minimize the cumulative time that each car waits at the intersection
 
-You will additionally be assessed on:
+## You will additionally be assessed on:
 - The quality of your code
 
-A few things to note about the simulation:
+## A few things to note about the simulation:
 - Cars waiting to go into the intersection can only move into the intersection if the light is green.
 - Cars already in the intersection can move out of the intersection even when the light is red or yellow.
 - A crash will occur if a car on horizantal street and a car on vertical street are in the intersection at the same time.
@@ -22,12 +21,16 @@ A few things to note about the simulation:
   lane will move into the intersection. Then, the second car will move into the intersection as the first car leaves. 
 
 To build the project, type the following in your bash terminal:
+```
 gcc traffic_light_problem.c -o traffic_light_problem
+```
 
 To run the project, type the following in your bash terminal:
+```
 ./traffic_light_problem.exe
+```
 
-Candidate Action Items:
+## Candidate Action Items:
 - Fill in the two unfinshed functions at the beginning of the file: 
   - char * setHorizantalTrafficLight(struct intersection_s intersection) and 
   - char * setVerticalTrafficLight(struct intersection_s intersection)

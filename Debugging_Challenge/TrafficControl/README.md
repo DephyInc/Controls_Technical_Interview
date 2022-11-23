@@ -1,11 +1,7 @@
 # Traffic Light Problem (1 hour)
 
 There's a busy traffic intersection outside your building. The roads at the intersection are horizantal street and vertical street. 
-You are an engineer with the department of transportation and you're trying to come up with a new traffic light pattern that 
-prevents cars from crashing in the intersection but also minimizes traffic jams. You ask a junior engineer to come up with a new 
-traffic pattern and simulate the traffic flow at the intersection for two minutes or until 40 cars pass through. They work on it 
-but then come to you saying they're stuck and they can't get the simulation to work. The traffic lights are exhibiting erratic 
-behavior, crashes aren't reported properly, and their output results of cumulative time waiting look off. They ask you to review 
+You are an engineer with the department of transportation and you're trying to come up with a new traffic light pattern that prevents cars from crashing in the intersection but also minimizes traffic jams. You ask a junior engineer to come up with a new traffic pattern and simulate the traffic flow at the intersection for two minutes or until 40 cars pass through. They work on it but then come to you saying they're stuck and they can't get the simulation to work. The traffic lights are exhibiting erratic behavior, crashes aren't reported properly, and their output results of cumulative time waiting look off. They ask you to review 
 their code and help them make it work.
 
 Your goal:
@@ -29,10 +25,14 @@ A few other things to note about the simulation:
   lane will move into the intersection. Then, the second car will move into the intersection as the first car leaves. 
 
 To build the project, type the following in your bash terminal:
+```bash
 gcc traffic_light_problem.c -o traffic_light_problem
+```
 
 To run the project, type the following in your bash terminal:
+```bash
 ./traffic_light_problem.exe
+```
 
 Candidate Action Items:
 - Find the errors in the code to make the simulation work as the junior engineer intended
