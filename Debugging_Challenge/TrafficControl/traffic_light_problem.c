@@ -62,7 +62,6 @@ void main(void)
 		//Update the traffic lights
 		myIntersection.horizantalTrafficColor = setHorizantalTrafficLight(myIntersection,&horizantalT);
 		myIntersection.verticalTrafficColor = setVerticalTrafficLight(myIntersection,&verticalT);
-		printf("%s\n",myIntersection.horizantalTrafficColor);
 
 		//Advance the lanes if possible
 		advanceLane(myIntersection.horizantalTrafficColor, &myIntersection.westboundCars);
