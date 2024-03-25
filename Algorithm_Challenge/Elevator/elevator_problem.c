@@ -53,7 +53,7 @@ int8_t getElevatorOccupancy(int8_t *destOccupancyArr, int8_t *curPassengers){
 }
 
 int8_t getMaxOccupantDestFreq(int8_t *destOccupancyArr, int8_t curFloor){
-	//find the max frequency of destination floors in elevator in order of nearest floors (default up)
+	//find the max frequency of destination floors in elevator checking nearest floors first (default up)
 	int8_t max = 0;
 	int8_t maxFloor = 0;
 	for (int8_t i=1; i < BUILDING_HEIGHT; i++){
@@ -80,7 +80,7 @@ int8_t getMaxOccupantDestFreq(int8_t *destOccupancyArr, int8_t curFloor){
 //Note: The output should be a number between 0 and (BUILDING_HEIGHT-1), inclusive
 static int8_t setNextElevatorStop(struct building_s building)
 {
-	// two main approaches: heuristic based or simulate and decide
+	// two main approaches: heuristic based or simulate forward best strategy
 	// choosing heuristic based for speed for the moment
 
 	//initialize array for storing the destination floor frequency of elevator occupants
@@ -94,7 +94,7 @@ static int8_t setNextElevatorStop(struct building_s building)
 	if (numOccupants > 0){ // elevator has occupants
 		//heuristic: go to floor where the majority of occupants want to go
 		desiredNextStop = getMaxOccupantDestFreq(occupants,curFloor); //get max freq floor
-		// to increase efficiency check for two things: people who want to get off along the way or people who can get on that want to go to that floor
+		// to increase efficiency check for two things: people who want to get off along the way or people who can get on along the way
 		if (desiredNextStop > curFloor){
 			curFloor++; // begin simulating forward on this strategy
 		} else {
@@ -105,29 +105,29 @@ static int8_t setNextElevatorStop(struct building_s building)
 				desiredNextStop = curFloor; // that is then the next stop
 				break;
 			}
-			if (numOccupants < ELEVATOR_MAX_CAPACITY && building.floors[curFloor].departures[1] > -1){ // check if people can be picked up along the way (watch indexing)
+			if (numOccupants < ELEVATOR_MAX_CAPACITY && (building.floors[curFloor].departures[1] > -1 || building.floors[curFloor].departures[0] > -1)){ // check if people can be picked up along the way (watch indexing)
 				desiredNextStop = curFloor;
 				break;
 			}
 			if (desiredNextStop > curFloor){ // update current floor
-				curFloor++; // begin simulating forward on this strategy
+				curFloor++;
 			} else {
 				curFloor--;
 			}
 		}
 	} else { //elevator empty
 		// heuristic: go to nearest floor with people
-		for (int8_t i = 1; i < BUILDING_HEIGHT; i++){ // cycle through possible next floors
+		for (int8_t i = 1; i < BUILDING_HEIGHT; i++){ // cycle through possible next floors default to go up
 			// check floor above first
 			if (curFloor + i < BUILDING_HEIGHT){
-				if (building.floors[curFloor+i].departures[1] > -1){ // if someone waiting (watch indexing)
+				if (building.floors[curFloor+i].departures[1] > -1 || building.floors[curFloor+i].departures[0] > -1){ // if someone waiting (watch indexing)
 					desiredNextStop = curFloor + i;
 					break;
 				}
 			}
 			// check floor below
 			if (curFloor - i > -1){
-				if (building.floors[curFloor-i].departures[1] > -1){ // if someone waiting
+				if (building.floors[curFloor-i].departures[1] > -1 || building.floors[curFloor+i].departures[0] > -1){ // if someone waiting
 					desiredNextStop = curFloor - i;
 					break;
 				}

@@ -62,6 +62,7 @@ void main(void)
 		//Update the traffic lights
 		myIntersection.horizantalTrafficColor = setHorizantalTrafficLight(myIntersection,&horizantalT);
 		myIntersection.verticalTrafficColor = setVerticalTrafficLight(myIntersection,&verticalT);
+		printf("%s\n",myIntersection.horizantalTrafficColor);
 
 		//Advance the lanes if possible
 		advanceLane(myIntersection.horizantalTrafficColor, &myIntersection.westboundCars);
@@ -76,7 +77,7 @@ void main(void)
 		delay(1000);
 
 		//Check to make sure no cars have crashed
-		if(checkForCrashes() == 1) //CORRECTION: we need to pass in the intersection
+		if(checkForCrashes() == 1)
 		{
 			printf("FAIL: Car crash!\n");
 			return;
@@ -85,7 +86,7 @@ void main(void)
 		//Check if all the cars have left the lanes
 		if(myIntersection.northboundCars.carsThatHaveLeft == 10 && myIntersection.southboundCars.carsThatHaveLeft == 10 && myIntersection.westboundCars.carsThatHaveLeft == 10 && myIntersection.eastboundCars.carsThatHaveLeft == 10)
 		{
-			int16_t totalWaitTime = myIntersection.northboundCars.timeWaiting + myIntersection.southboundCars.timeWaiting + myIntersection.westboundCars.timeWaiting + myIntersection.eastboundCars.timeWaiting;
+			int16_t totalWaitTime = myIntersection.northboundCars.timeWaiting + myIntersection.southboundCars.timeWaiting + myIntersection.westboundCars.timeWaiting + myIntersection.eastboundCars.timeWaiting; // CORRECTION: made in the header to up these values to int16_t
 			printf("SUCCESS: You got all the cars through! The total wait time was: %i seconds!\n", totalWaitTime);
 			return;
 		}
@@ -124,14 +125,13 @@ static char * setHorizantalTrafficLight(struct intersection_s intersection, int8
 	{
 		currentColorEnum = RED;
 	}
-	else if(strcmp(currentColor,"G") == 0)
+	if(strcmp(currentColor,"G") == 0)
 	{
 		currentColorEnum = GREEN;
-
-		if(strcmp(currentColor,"Y") == 0) // CORRECTION: We never actually get here in the code though it doesn't matter since the default is red
-		{
-			currentColorEnum = YELLOW;
-		}
+	}
+	if(strcmp(currentColor,"Y") == 0)
+	{
+		currentColorEnum = YELLOW; // CORRECTION: We never actually got here in the code though it didn't matter since the default is red
 	}
 
 	(*t)++; //CORRECTION: now with pointer

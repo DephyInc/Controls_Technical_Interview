@@ -41,11 +41,11 @@ Candidate Action Items:
   - What would you tell the junior engineer about ways that they could improve their code in the future? (1-3 sentences)
     - Improving readability: see note on using a variable for total north and southbound so it's less difficult to read
     - Add more comments throughout to explain your thinking process
-    - There is some useless code like the YELLOW case that doesn't get used so either delete or change the condition
+    - Watch for things like missing breaks, integer overflow, what needs to get accessed inside or outside a function, and of course the annoying typos!
   - How else would you change this code to make it better so you can build on it in the future?(1-10 sentences).
-    - The light timeout should be a variable that can change and needs to be thought through more (e.g. have a min light time and a max light time).
-    - The light itself could be a struct that stores both the light's current condition as well as the time it's been in that condition. This change will make it easier to implement a min time and a max time.
-    - Most of the code between horizantal and vertical is copied between the two; using an external function that could be used by both would be helpful (e.g. a change light function could be useful in multiple places)
+    - The light timeout should be a variable that can change and needs to be thought through more (e.g. have a min light time and a max light time and spend some time tuning those variables).
+    - The light itself could be a struct that stores both the light's current condition as well as the time it's been in that condition. This change will make it easier to implement a min time and a max time and get rid of the need for additional counters.
+    - Most of the code between horizantal and vertical is copied between the two; using an external function that could be used by both would be helpful (e.g. a change light function could be useful in multiple places and the order is the same R->G->Y so it can just cycle through those values)
 
 Don't forget; we are interested in both your solution and your thought process.
 
