@@ -39,9 +39,13 @@ Candidate Action Items:
 - Make any other improvements to the code as you see fit
 - Answer the following questions:
   - What would you tell the junior engineer about ways that they could improve their code in the future? (1-3 sentences)
-    - ADD YOUR ANSWER HERE
+    - Improving readability: see note on using a variable for total north and southbound so it's less difficult to read
+    - Add more comments throughout to explain your thinking process
+    - There is some useless code like the YELLOW case that doesn't get used so either delete or change the condition
   - How else would you change this code to make it better so you can build on it in the future?(1-10 sentences).
-    - ADD YOUR ANSWER HERE
+    - The light timeout should be a variable that can change and needs to be thought through more (e.g. have a min light time and a max light time).
+    - The light itself could be a struct that stores both the light's current condition as well as the time it's been in that condition. This change will make it easier to implement a min time and a max time.
+    - Most of the code between horizantal and vertical is copied between the two; using an external function that could be used by both would be helpful (e.g. a change light function could be useful in multiple places)
 
 Don't forget; we are interested in both your solution and your thought process.
 

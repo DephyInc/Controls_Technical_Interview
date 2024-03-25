@@ -28,8 +28,8 @@ struct intersection_s myIntersection;
 // Private Function Prototype(s):
 //****************************************************************************
 static void initIntersection(void);
-static char * setHorizantalTrafficLight(struct intersection_s intersection);
-static char * setVerticalTrafficLight(struct intersection_s intersection);
+static char * setHorizantalTrafficLight(struct intersection_s intersection, int8_t *t); // UPDATE: include the new t variable
+static char * setVerticalTrafficLight(struct intersection_s intersection, int8_t *t); //UPDATE: include the new t variable
 static void advanceLane(char * trafficColor, struct lane_of_cars_s * lane);
 static void drawIntersection(struct intersection_s intersection);
 static void drawUpperVerticalRoad(char * trafficColor, struct lane_of_cars_s northboundCars, struct lane_of_cars_s southboundCars);
@@ -52,12 +52,16 @@ void main(void)
 	//Initialize the intersection
 	initIntersection();
 
+	// CORRECTION: add t counters for how long a light has been in a certain state
+	int8_t horizantalT = 0;
+	int8_t verticalT = 0;
+
 	//Run traffic through the intersection for a set period of time
 	for(int8_t i = 0; i < 120; i++)
 	{
 		//Update the traffic lights
-		myIntersection.horizantalTrafficColor = setHorizantalTrafficLight(myIntersection);
-		myIntersection.verticalTrafficColor = setVerticalTrafficLight(myIntersection);
+		myIntersection.horizantalTrafficColor = setHorizantalTrafficLight(myIntersection,&horizantalT);
+		myIntersection.verticalTrafficColor = setVerticalTrafficLight(myIntersection,&verticalT);
 
 		//Advance the lanes if possible
 		advanceLane(myIntersection.horizantalTrafficColor, &myIntersection.westboundCars);
@@ -72,7 +76,7 @@ void main(void)
 		delay(1000);
 
 		//Check to make sure no cars have crashed
-		if(checkForCrashes() == 1)
+		if(checkForCrashes() == 1) //CORRECTION: we need to pass in the intersection
 		{
 			printf("FAIL: Car crash!\n");
 			return;
@@ -108,9 +112,10 @@ static void initIntersection(void)
 	myIntersection.southboundCars.popularity = 4;
 }
 
-static char * setHorizantalTrafficLight(struct intersection_s intersection)
+static char * setHorizantalTrafficLight(struct intersection_s intersection, int8_t *t)
 {
-	static int8_t t = 0;
+	// static int8_t t = 0; CORRECTION: this variable continues being initialized inside the loop so it isn't operating as intended
+	// instead initialize this counter externally
 	char * currentColor = intersection.horizantalTrafficColor;
 	char * newColor = currentColor;
 	traffic_light_colors_t currentColorEnum = -1;
@@ -123,47 +128,52 @@ static char * setHorizantalTrafficLight(struct intersection_s intersection)
 	{
 		currentColorEnum = GREEN;
 
-		if(strcmp(currentColor,"Y") == 0)
+		if(strcmp(currentColor,"Y") == 0) // CORRECTION: We never actually get here in the code though it doesn't matter since the default is red
 		{
 			currentColorEnum = YELLOW;
 		}
 	}
 
-	t++;
+	(*t)++; //CORRECTION: now with pointer
+	int8_t horizantalWaitingTotal = intersection.eastboundCars.carsWaitingAtIntersection + intersection.westboundCars.carsWaitingAtIntersection; // not necessary but so much easier to read
+	int8_t verticalWaitingTotal = intersection.northboundCars.carsWaitingAtIntersection + intersection.southboundCars.carsWaitingAtIntersection; // same as above
 	switch(currentColorEnum)
 	{
 		case RED:
-			if((intersection.eastboundCars.carsWaitingAtIntersection + intersection.westboundCars.carsWaitingAtIntersection >= intersection.northboundCars.carsWaitingAtIntersection + intersection.southboundCars.carsWaitingAtIntersection) && (strcmp(intersection.verticalTrafficColor,"R") == 0))
+			if(((horizantalWaitingTotal >= verticalWaitingTotal) || (*t > 10)) && (strcmp(intersection.verticalTrafficColor,"R") == 0)) //CORRECTION: if we timeout for a light we must allow this light to change
 			{
 				newColor = "G";
-				t = 0;
+				*t = 0;
 			}
+			break; // CORRECTION: missing break
 
 		case GREEN:
-			if((intersection.eastboundCars.carsWaitingAtIntersection + intersection.westboundCars.carsWaitingAtIntersection < intersection.northboundCars.carsWaitingAtIntersection + intersection.southboundCars.carsWaitingAtIntersection) || t > 10)
+			if((horizantalWaitingTotal < verticalWaitingTotal) || *t > 10)
 			{
 				newColor = "Y";
-				t = 0;
+				*t = 0;
 			}
+			break; // CORRECTION: missing break
 
-		case YELLOW:
-			if(t > 1)
-			{
-				newColor = "R";
-				t = 0;
-			}
+		case YELLOW: // This never actually gets used
+			//if(t > 1) // no need for this if we are only waiting 1 time step
+			//{
+			newColor = "R";
+			*t = 0;
+			//}
+			break; // CORRECTION: missing break
 
 		default:
 			newColor = "R";
-			t = 0;	
+			*t = 0;	
 	}
 
 	return newColor;
 }
 
-static char * setVerticalTrafficLight(struct intersection_s intersection)
+static char * setVerticalTrafficLight(struct intersection_s intersection, int8_t *t)
 {
-	static int8_t t = 0;
+	// static int8_t t = 0; CORRECTION as above put this outside the loop
 	char * currentColor = intersection.verticalTrafficColor;
 	char * newColor = currentColor;
 	traffic_light_colors_t currentColorEnum = -1;
@@ -171,48 +181,49 @@ static char * setVerticalTrafficLight(struct intersection_s intersection)
 	if(strcmp(currentColor,"R") == 0)
 	{
 		currentColorEnum = RED;
-
-		if(strcmp(currentColor,"G") == 0)
-		{	
-			currentColorEnum = GREEN;
-		}
+	}
+	if(strcmp(currentColor,"G") == 0) //CORRECTION: here the fact that this was in the red strcmp is an issue
+	{	
+		currentColorEnum = GREEN;
 	}
 	else if(strcmp(currentColor,"Y") == 0)
 	{
 		currentColorEnum = YELLOW;
 	}
 
-	t++;
+	(*t)++; //CORRECTION: now with pointer
+	int8_t horizantalWaitingTotal = intersection.eastboundCars.carsWaitingAtIntersection + intersection.westboundCars.carsWaitingAtIntersection; // not necessary but so much easier to read
+	int8_t verticalWaitingTotal = intersection.northboundCars.carsWaitingAtIntersection + intersection.southboundCars.carsWaitingAtIntersection; // same as above
 	switch(currentColorEnum)
 	{
 		case RED:
-			if((intersection.eastboundCars.carsWaitingAtIntersection + intersection.westboundCars.carsWaitingAtIntersection < intersection.northboundCars.carsWaitingAtIntersection + intersection.southboundCars.carsWaitingAtIntersection) && (strcmp(intersection.horizantalTrafficColor,"R") == 0))
+			if(((horizantalWaitingTotal < verticalWaitingTotal) || (*t > 10)) && (strcmp(intersection.horizantalTrafficColor,"R") == 0)) //CORRECTION: if we timeout for a light we must allow this light to change
 			{
 				newColor = "G";
-				t = 0;
+				*t = 0;
 			}
 			break;
 
 		case GREEN:
-			if((intersection.eastboundCars.carsWaitingAtIntersection + intersection.westboundCars.carsWaitingAtIntersection >= intersection.northboundCars.carsWaitingAtIntersection + intersection.southboundCars.carsWaitingAtIntersection) || t > 10)
+			if((horizantalWaitingTotal >= verticalWaitingTotal) || *t > 10)
 			{
 				newColor = "Y";
-				t = 0;
+				*t = 0;
 			}
 			break;
 
 		case YELLOW:
-			if(t > 1)
-			{
-				newColor = "R";
-				t = 0;
-			}
+			// if(t > 1) //no need if we are only waiting 1
+			//{
+			newColor = "R";
+			*t = 0;
+			//}
 			break;
 
 		default:
 			newColor = "R";
-			t = 0;
-			break;	
+			*t = 0;
+			//break; // no need for a break here	
 	}
 
 	return newColor;
@@ -425,7 +436,7 @@ static void delay(int16_t ms)
 static int8_t checkForCrashes(void)
 {
 	int8_t isHorizantalCarInIntersection = (myIntersection.westboundCars.carsInIntersection | myIntersection.eastboundCars.carsInIntersection);
-	int8_t isVerticalCarInIntersection = (myIntersection.westboundCars.carsInIntersection | myIntersection.eastboundCars.carsInIntersection);
+	int8_t isVerticalCarInIntersection = (myIntersection.northboundCars.carsInIntersection | myIntersection.southboundCars.carsInIntersection); // CORRECTION:this should be north and south
 
 	if(isHorizantalCarInIntersection && isVerticalCarInIntersection){return 1;}
 	return 0;
