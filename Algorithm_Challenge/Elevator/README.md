@@ -39,7 +39,9 @@ Candidate Action Items:
   above function, please do not edit the code that's already in the files, unless you are extremely certain that 
   there's a bug in the code.
 - Briefly describe your implementation (1-3 sentences).
-  - ADD YOUR ANSWER HERE
+  - Use heuristics on the current step rather than forward planning for quick decisions
+  - If the elevator is empty go to the nearest floor with people
+  - If the elevator has occupants go to the floor that will maximize the number of people that will exit the elevator while also dropping off or picking up along the way (if possible)
 
 Don't forget; we are interested in both your solution and your thought process.
 

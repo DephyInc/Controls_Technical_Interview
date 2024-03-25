@@ -40,13 +40,101 @@ static void delay(int16_t ms);
 // Functions You (the Interviewee) Should Edit:
 //****************************************************************************
 
+//this function gets the number of occupants in the elevator as well as getting the frequency of destination floors in the elevator
+int8_t getElevatorOccupancy(int8_t *destOccupancyArr, int8_t *curPassengers){
+	int8_t numOccupants = 0; // number of Occupants
+	for (int8_t i=0; i < ELEVATOR_MAX_CAPACITY; i++){
+		if (curPassengers[i] > -1){ //add occupant
+			destOccupancyArr[curPassengers[i]] += 1; // put in frequency table
+			numOccupants++;
+		}
+	}
+	return numOccupants;
+}
+
+int8_t getMaxOccupantDestFreq(int8_t *destOccupancyArr, int8_t curFloor){
+	//find the max frequency of destination floors in elevator in order of nearest floors (default up)
+	int8_t max = 0;
+	int8_t maxFloor = 0;
+	for (int8_t i=1; i < BUILDING_HEIGHT; i++){
+		// check up
+		if (curFloor + i < BUILDING_HEIGHT){
+			if (destOccupancyArr[curFloor + i] > max){
+				max = destOccupancyArr[curFloor + i];
+				maxFloor = curFloor + i;
+			}
+		}
+		if (curFloor - i > -1){
+			if (destOccupancyArr[curFloor - i] > max){
+				max = destOccupancyArr[curFloor - i];
+				maxFloor = curFloor - i;
+			}
+		}
+	}
+	return maxFloor;
+}
+
 //Returns the floor the elevator should STOP at next
 //To stop at a floor means to open the doors and let passengers on and off. It 
 //is possible to pass through a floor without stopping there.
 //Note: The output should be a number between 0 and (BUILDING_HEIGHT-1), inclusive
 static int8_t setNextElevatorStop(struct building_s building)
 {
-	return 0;
+	// two main approaches: heuristic based or simulate and decide
+	// choosing heuristic based for speed for the moment
+
+	//initialize array for storing the destination floor frequency of elevator occupants
+	int8_t occupants[BUILDING_HEIGHT] = {0};
+	int8_t numOccupants = getElevatorOccupancy(occupants,building.elevator.passengers); // gives 0 if elevator empty
+	int8_t curFloor = building.elevator.currentFloor;
+	int8_t desiredNextStop = 0; //initialize output
+
+
+	// two main conditions: elevator empty or elevator has occupants
+	if (numOccupants > 0){ // elevator has occupants
+		//heuristic: go to floor where the majority of occupants want to go
+		desiredNextStop = getMaxOccupantDestFreq(occupants,curFloor); //get max freq floor
+		// to increase efficiency check for two things: people who want to get off along the way or people who can get on that want to go to that floor
+		if (desiredNextStop > curFloor){
+			curFloor++; // begin simulating forward on this strategy
+		} else {
+			curFloor--;
+		}
+		while (curFloor != desiredNextStop){
+			if (occupants[curFloor] > 0){ // check frequency array to see if someone wants to get off along the way (watch indexing)
+				desiredNextStop = curFloor; // that is then the next stop
+				break;
+			}
+			if (numOccupants < ELEVATOR_MAX_CAPACITY && building.floors[curFloor].departures[0] > -1){ // check if people can be picked up along the way (watch indexing)
+				desiredNextStop = curFloor;
+				break;
+			}
+			if (desiredNextStop > curFloor){ // update current floor
+				curFloor++; // begin simulating forward on this strategy
+			} else {
+				curFloor--;
+			}
+		}
+	} else { //elevator empty
+		// heuristic: go to nearest floor with people
+		for (int8_t i = 0; i < BUILDING_HEIGHT; i++){ // cycle through possible next floors
+			// check floor above first
+			if (curFloor + i < BUILDING_HEIGHT){
+				if (building.floors[curFloor+i].departures[0] > -1){ // if someone waiting (watch indexing)
+					desiredNextStop = curFloor + i;
+					break;
+				}
+			}
+			// check floor below
+			if (curFloor - i > -1){
+				if (building.floors[curFloor-i].departures[0] > -1){ // if someone waiting
+					desiredNextStop = curFloor - i;
+					break;
+				}
+			}
+		}
+	}
+	return desiredNextStop;
 }
 
 
