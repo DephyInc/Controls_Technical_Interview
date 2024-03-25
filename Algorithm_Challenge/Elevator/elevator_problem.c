@@ -105,7 +105,7 @@ static int8_t setNextElevatorStop(struct building_s building)
 				desiredNextStop = curFloor; // that is then the next stop
 				break;
 			}
-			if (numOccupants < ELEVATOR_MAX_CAPACITY && building.floors[curFloor].departures[0] > -1){ // check if people can be picked up along the way (watch indexing)
+			if (numOccupants < ELEVATOR_MAX_CAPACITY && building.floors[curFloor].departures[1] > -1){ // check if people can be picked up along the way (watch indexing)
 				desiredNextStop = curFloor;
 				break;
 			}
@@ -117,17 +117,17 @@ static int8_t setNextElevatorStop(struct building_s building)
 		}
 	} else { //elevator empty
 		// heuristic: go to nearest floor with people
-		for (int8_t i = 0; i < BUILDING_HEIGHT; i++){ // cycle through possible next floors
+		for (int8_t i = 1; i < BUILDING_HEIGHT; i++){ // cycle through possible next floors
 			// check floor above first
 			if (curFloor + i < BUILDING_HEIGHT){
-				if (building.floors[curFloor+i].departures[0] > -1){ // if someone waiting (watch indexing)
+				if (building.floors[curFloor+i].departures[1] > -1){ // if someone waiting (watch indexing)
 					desiredNextStop = curFloor + i;
 					break;
 				}
 			}
 			// check floor below
 			if (curFloor - i > -1){
-				if (building.floors[curFloor-i].departures[0] > -1){ // if someone waiting
+				if (building.floors[curFloor-i].departures[1] > -1){ // if someone waiting
 					desiredNextStop = curFloor - i;
 					break;
 				}
