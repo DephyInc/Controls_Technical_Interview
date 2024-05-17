@@ -69,7 +69,7 @@ void main(void)
 		system("clear");
 		drawIntersection(myIntersection);
 		fflush(stdout);
-		delay(1000);
+		delay(10);//delay(1000); //Can simulate faster than real time... Have a switch to change between realtime sim and faster than realtime sim.
 
 		//Check to make sure no cars have crashed
 		if(checkForCrashes() == 1)
@@ -81,15 +81,15 @@ void main(void)
 		//Check if all the cars have left the lanes
 		if(myIntersection.northboundCars.carsThatHaveLeft == 10 && myIntersection.southboundCars.carsThatHaveLeft == 10 && myIntersection.westboundCars.carsThatHaveLeft == 10 && myIntersection.eastboundCars.carsThatHaveLeft == 10)
 		{
-			int16_t totalWaitTime = myIntersection.northboundCars.timeWaiting + myIntersection.southboundCars.timeWaiting + myIntersection.westboundCars.timeWaiting + myIntersection.eastboundCars.timeWaiting;
+			uint16_t totalWaitTime = myIntersection.northboundCars.timeWaiting + myIntersection.southboundCars.timeWaiting + myIntersection.westboundCars.timeWaiting + myIntersection.eastboundCars.timeWaiting;
 			printf("SUCCESS: You got all the cars through! The total wait time was: %i seconds!\n", totalWaitTime);
 			return;
 		}
 	}
 
 	//If the animation time's out, let them know their score.
-	int8_t totalCarsThatMadeIt = myIntersection.northboundCars.carsThatHaveLeft + myIntersection.southboundCars.carsThatHaveLeft + myIntersection.westboundCars.carsThatHaveLeft + myIntersection.eastboundCars.carsThatHaveLeft;
-	int16_t totalWaitTime = myIntersection.northboundCars.timeWaiting + myIntersection.southboundCars.timeWaiting + myIntersection.westboundCars.timeWaiting + myIntersection.eastboundCars.timeWaiting;
+	uint8_t totalCarsThatMadeIt = myIntersection.northboundCars.carsThatHaveLeft + myIntersection.southboundCars.carsThatHaveLeft + myIntersection.westboundCars.carsThatHaveLeft + myIntersection.eastboundCars.carsThatHaveLeft;
+	uint16_t totalWaitTime = myIntersection.northboundCars.timeWaiting + myIntersection.southboundCars.timeWaiting + myIntersection.westboundCars.timeWaiting + myIntersection.eastboundCars.timeWaiting;
 	printf("FAIL: Traffic Jam! You ran out of time. You got %i/40 cars through in 120 seconds. The total wait time was: %i seconds.\n", totalCarsThatMadeIt, totalWaitTime);
 }
 
@@ -122,12 +122,12 @@ static char * setHorizantalTrafficLight(struct intersection_s intersection)
 	else if(strcmp(currentColor,"G") == 0)
 	{
 		currentColorEnum = GREEN;
-
-		if(strcmp(currentColor,"Y") == 0)
-		{
-			currentColorEnum = YELLOW;
-		}
 	}
+	else if(strcmp(currentColor,"Y") == 0)
+	{
+		currentColorEnum = YELLOW;
+	}
+	
 
 	t++;
 	switch(currentColorEnum)
@@ -138,6 +138,7 @@ static char * setHorizantalTrafficLight(struct intersection_s intersection)
 				newColor = "G";
 				t = 0;
 			}
+			break;
 
 		case GREEN:
 			if((intersection.eastboundCars.carsWaitingAtIntersection + intersection.westboundCars.carsWaitingAtIntersection < intersection.northboundCars.carsWaitingAtIntersection + intersection.southboundCars.carsWaitingAtIntersection) || t > 10)
@@ -145,6 +146,7 @@ static char * setHorizantalTrafficLight(struct intersection_s intersection)
 				newColor = "Y";
 				t = 0;
 			}
+			break;
 
 		case YELLOW:
 			if(t > 1)
@@ -152,10 +154,12 @@ static char * setHorizantalTrafficLight(struct intersection_s intersection)
 				newColor = "R";
 				t = 0;
 			}
+			break;
 
 		default:
 			newColor = "R";
-			t = 0;	
+			t = 0;
+			break;	
 	}
 
 	return newColor;
@@ -171,11 +175,10 @@ static char * setVerticalTrafficLight(struct intersection_s intersection)
 	if(strcmp(currentColor,"R") == 0)
 	{
 		currentColorEnum = RED;
-
-		if(strcmp(currentColor,"G") == 0)
-		{	
-			currentColorEnum = GREEN;
-		}
+	}
+	else if(strcmp(currentColor,"G") == 0)
+	{
+		currentColorEnum = GREEN;
 	}
 	else if(strcmp(currentColor,"Y") == 0)
 	{
@@ -425,8 +428,7 @@ static void delay(int16_t ms)
 static int8_t checkForCrashes(void)
 {
 	int8_t isHorizantalCarInIntersection = (myIntersection.westboundCars.carsInIntersection | myIntersection.eastboundCars.carsInIntersection);
-	int8_t isVerticalCarInIntersection = (myIntersection.westboundCars.carsInIntersection | myIntersection.eastboundCars.carsInIntersection);
+	int8_t isVerticalCarInIntersection = (myIntersection.northboundCars.carsInIntersection | myIntersection.southboundCars.carsInIntersection);
 
-	if(isHorizantalCarInIntersection && isVerticalCarInIntersection){return 1;}
-	return 0;
+	return (isHorizantalCarInIntersection && isVerticalCarInIntersection);
 }

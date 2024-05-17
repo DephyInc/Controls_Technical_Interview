@@ -33,13 +33,13 @@ typedef enum
 //****************************************************************************
 struct lane_of_cars_s
 {
-	int8_t carsWaitingAtIntersection;
-	int8_t carsInIntersection;
-	int8_t carsLeavingIntersection;
-	int8_t carsThatHaveLeft;
+	uint16_t carsWaitingAtIntersection;
+	uint8_t carsInIntersection;
+	uint8_t carsLeavingIntersection;
+	uint8_t carsThatHaveLeft;
 	
-	int8_t popularity;
-	int8_t timeWaiting;
+	uint8_t popularity;
+	uint16_t timeWaiting;
 };
 
 struct intersection_s
