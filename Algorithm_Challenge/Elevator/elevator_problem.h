@@ -23,6 +23,7 @@
 //****************************************************************************
 #define ELEVATOR_MAX_CAPACITY	3
 #define BUILDING_HEIGHT			5
+#define FLOOR_MAX_DEPARTURES	2
 
 //****************************************************************************
 // Structures(s)
@@ -36,7 +37,7 @@ struct elevator_s
 
 struct floor_s
 {
-	int8_t departures[2];
+	int8_t departures[FLOOR_MAX_DEPARTURES];
 	int8_t arrivals;
 };
 

@@ -40,13 +40,142 @@ static void delay(int16_t ms);
 // Functions You (the Interviewee) Should Edit:
 //****************************************************************************
 
+static int number_departures(struct building_s building,int floor){
+	int nDepartures = 0;
+	for(int i=0;i<FLOOR_MAX_DEPARTURES;i++){ 
+		if (building.floors[floor].departures[i]!=-1){
+			nDepartures++;
+		}
+	}
+	return nDepartures;
+}
+
+static int number_passengers(struct elevator_s elevator){
+	int nPassengers = 0;
+	for(int i=0;i<ELEVATOR_MAX_CAPACITY;i++){
+		if (elevator.passengers[i]!=-1){
+			nPassengers++;
+		}
+	}
+	return nPassengers;
+}
+
 //Returns the floor the elevator should STOP at next
 //To stop at a floor means to open the doors and let passengers on and off. It 
 //is possible to pass through a floor without stopping there.
 //Note: The output should be a number between 0 and (BUILDING_HEIGHT-1), inclusive
 static int8_t setNextElevatorStop(struct building_s building)
 {
-	return 0;
+	// return rand()%5; // Test changing elevator. Works (but too slow as expected).
+
+	//If not at the target floor yet, don't redecide: keep going. Avoid second guessing/possible logic jitter.
+	if (building.elevator.nextStop != building.elevator.currentFloor){
+		return building.elevator.nextStop;
+	}
+
+	int8_t nDepartures[BUILDING_HEIGHT];
+	for (int i=0;i<BUILDING_HEIGHT;i++){
+		nDepartures[i]=number_departures(building,i);
+	}
+
+	//If at current floor and have no people on the elevator, and there are departures here, pick them up.
+	if (building.elevator.nextStop == building.elevator.currentFloor){
+		if (number_passengers(building.elevator)==0){
+			if (nDepartures[building.elevator.currentFloor]>0){
+				return building.elevator.currentFloor;
+			}
+			else{ // find which floor (best?) to move to with people waiting.
+				//Farthest floors have highest cost to transport those people. Move there first so not bouncing to farthest floors at end?
+				//Nearest floors have lowest travel costs.
+				// if at 0 or 4, check in sequence.
+				// if at 1 or 3, check 0/4 then 2/2-> 4/0
+				// if at 2, check for most passengers at 0/4, then 1/3
+				switch(building.elevator.currentFloor){
+					case 0:
+						for (int i=1;i<BUILDING_HEIGHT;i++){
+							if (nDepartures[i]>0){
+								return i;
+							}
+						}
+						break;
+					case 1:
+						if (nDepartures[0]>0){
+							return 0;
+						}
+						for (int i=2;i<=4;i++){
+							if (nDepartures[i]>0){
+								return i;
+							}
+						}
+						break;
+					case 2:
+						if (nDepartures[0]==2){
+							return 0;
+						}
+						if (nDepartures[4]==2){
+							return 4;
+						}
+						if (nDepartures[0]==1){
+							return 0;
+						}
+						if (nDepartures[4]==1){
+							return 4;
+						}
+						if (nDepartures[1]==2){
+							return 1;
+						}
+						if (nDepartures[3]==2){
+							return 3;
+						}
+						if (nDepartures[1]==1){
+							return 1;
+						}
+						if (nDepartures[3]==1){
+							return 3;
+						}
+						//No one left!?
+						return 2;
+						break;
+					case 3:
+						if (nDepartures[4]>0){
+							return 4;
+						}
+						for (int i=2;i>=0;i--){
+							if (nDepartures[i]>0){
+								return i;
+							}
+						}
+						break;
+					case 4:
+						for (int i=3;i>=0;i--){
+							if (nDepartures[i]>0){
+								return i;
+							}
+						}
+						break;
+				}
+			}
+		}
+		else{ //Go to floor of one of the passengers.
+			//Go to nearest destination.
+			//If multiple nearest destinations? take into account number of departures at destination and current elevator capacity.
+			int targetFloor = -1;
+			for (int i=0;i<ELEVATOR_MAX_CAPACITY;i++){
+				if (building.elevator.passengers[i]!=-1){
+					if(targetFloor==-1){
+						targetFloor = building.elevator.passengers[i];
+					}
+					else{
+						if (abs(targetFloor-building.elevator.currentFloor)>abs(building.elevator.passengers[i]-building.elevator.currentFloor)){
+							targetFloor = building.elevator.passengers[i];
+						}
+					}
+				}
+			}
+			return targetFloor;
+		}
+	}
+	return rand()%5; //Shouldn't get here anymore.
 }
 
 
