@@ -39,7 +39,14 @@ Candidate Action Items:
   above function, please do not edit the code that's already in the files, unless you are extremely certain that 
   there's a bug in the code.
 - Briefly describe your implementation (1-3 sentences).
-  - ADD YOUR ANSWER HERE
+  - This was a rough first-pass sequence meant to 
+	1) Guarantee everyone will be picked up and dropped off (eventually), and 
+	2) I used some rough rules-of-thumb to try to make some reasonable choices to reduce the time.
+		a) The time to load/unload the passengers had a greater cost than most floor to floor changes.
+		b) picking up passengers at the end floors (e.g. 0 and 4) had the greatest possible travel costs. So try to pick them up when they are near otherwise the travel costs will be magnified when moving away from them and then having to travel back to them.
+		c) Picking up two passengers costs the same as picking up one, however, not picking up everyone (because of a full eleveator) will have a much higher cost because the elevator will increase both travel and pickup time costs. Prioritize dropping passengers off and anyone who gets on is essentially a free trip. Prioritize getting multiple passengers at the same time.
+  - There was some initial time thought about whether this can be fit into a node traversal problem or forward/backward scheme that can compute an optimal sequence, but the number of times a node needed to be visited and the order of visiting the nodes didn't allow for an easy adaptation and so the quicker rule-of-thumb implementation was done first. There is more optimization and guarantees that could be computed with additional time, but since experimentally the initial implementation met the requirements, the need to optimize further would need to be weighed against alternate tasks.
+  - The use of the switch statements was quick and dirty, but showed the intent. There are potential alternative formulations that may do the same thing (or better). 
 
 Don't forget; we are interested in both your solution and your thought process.
 
