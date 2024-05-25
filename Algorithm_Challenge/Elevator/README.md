@@ -39,7 +39,13 @@ Candidate Action Items:
   above function, please do not edit the code that's already in the files, unless you are extremely certain that 
   there's a bug in the code.
 - Briefly describe your implementation (1-3 sentences).
-  - ADD YOUR ANSWER HERE
+The Main idea is to get the direction of the elevator moving in a particular direction. If there are drops along the way do it or If there are any drop request along the way do it and if full then keep proceeding to the next stop.
+
+Note; The direction change happens when the passengers in the elevator are no longer have the destination along the direction of the travel.
+
+Possible improvements:
+1. The code can be optimized by combining the direction change and the next stop code.
+2. if you drop off all the passengers then elevator will search for the next floor with the passengers. This step does not account for the closet.
 
 Don't forget; we are interested in both your solution and your thought process.
 
