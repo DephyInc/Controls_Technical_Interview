@@ -52,12 +52,14 @@ void main(void)
 	//Initialize the intersection
 	initIntersection();
 
+
 	//Run traffic through the intersection for a set period of time
 	for(int8_t i = 0; i < 120; i++)
 	{
 		//Update the traffic lights
 		myIntersection.horizantalTrafficColor = setHorizantalTrafficLight(myIntersection);
 		myIntersection.verticalTrafficColor = setVerticalTrafficLight(myIntersection);
+
 
 		//Advance the lanes if possible
 		advanceLane(myIntersection.horizantalTrafficColor, &myIntersection.westboundCars);
@@ -100,7 +102,7 @@ void main(void)
 static void initIntersection(void)
 {
 	myIntersection.horizantalTrafficColor = "R";
-	myIntersection.verticalTrafficColor = "R";
+	myIntersection.verticalTrafficColor = "G";
 
 	myIntersection.eastboundCars.popularity = 3;
 	myIntersection.westboundCars.popularity = 5;
@@ -123,10 +125,11 @@ static char * setHorizantalTrafficLight(struct intersection_s intersection)
 	{
 		currentColorEnum = GREEN;
 
-		if(strcmp(currentColor,"Y") == 0)
-		{
-			currentColorEnum = YELLOW;
-		}
+
+	}
+	else if(strcmp(currentColor,"Y") == 0)
+	{
+		currentColorEnum = YELLOW;
 	}
 
 	t++;
@@ -138,6 +141,7 @@ static char * setHorizantalTrafficLight(struct intersection_s intersection)
 				newColor = "G";
 				t = 0;
 			}
+			break; // missing break statement
 
 		case GREEN:
 			if((intersection.eastboundCars.carsWaitingAtIntersection + intersection.westboundCars.carsWaitingAtIntersection < intersection.northboundCars.carsWaitingAtIntersection + intersection.southboundCars.carsWaitingAtIntersection) || t > 10)
@@ -145,6 +149,7 @@ static char * setHorizantalTrafficLight(struct intersection_s intersection)
 				newColor = "Y";
 				t = 0;
 			}
+			break;
 
 		case YELLOW:
 			if(t > 1)
@@ -152,6 +157,7 @@ static char * setHorizantalTrafficLight(struct intersection_s intersection)
 				newColor = "R";
 				t = 0;
 			}
+			break;
 
 		default:
 			newColor = "R";
@@ -172,10 +178,11 @@ static char * setVerticalTrafficLight(struct intersection_s intersection)
 	{
 		currentColorEnum = RED;
 
-		if(strcmp(currentColor,"G") == 0)
-		{	
-			currentColorEnum = GREEN;
-		}
+
+	}
+	else if(strcmp(currentColor,"G") == 0)
+	{	
+		currentColorEnum = GREEN;
 	}
 	else if(strcmp(currentColor,"Y") == 0)
 	{
@@ -425,7 +432,7 @@ static void delay(int16_t ms)
 static int8_t checkForCrashes(void)
 {
 	int8_t isHorizantalCarInIntersection = (myIntersection.westboundCars.carsInIntersection | myIntersection.eastboundCars.carsInIntersection);
-	int8_t isVerticalCarInIntersection = (myIntersection.westboundCars.carsInIntersection | myIntersection.eastboundCars.carsInIntersection);
+	int8_t isVerticalCarInIntersection = (myIntersection.northboundCars.carsInIntersection | myIntersection.southboundCars.carsInIntersection);
 
 	if(isHorizantalCarInIntersection && isVerticalCarInIntersection){return 1;}
 	return 0;
