@@ -44,9 +44,197 @@ static void delay(int16_t ms);
 //To stop at a floor means to open the doors and let passengers on and off. It 
 //is possible to pass through a floor without stopping there.
 //Note: The output should be a number between 0 and (BUILDING_HEIGHT-1), inclusive
+// enum for the direction of the elevator. 
+static struct  elevator_direction_state
+{
+	enum {INITIAL, UP, DOWN, STOP} direction;
+};
+
+static struct elevator_direction_state elevator_direction;
+
+// this is a helper function which returns the number of passengers in the elevator.A
+static int8_t num_passengers(struct building_s building)
+{
+	int8_t num_passengers = 0;
+	for (int8_t i = 0; i < ELEVATOR_MAX_CAPACITY; i++)
+	{
+		if (building.elevator.passengers[i] != -1)
+		{
+			num_passengers++;
+		}
+	}
+	return num_passengers;
+}
+
+// the elevator direction or check if the 
+static int8_t get_elevator_direction(struct building_s building)
+{
+	// if the no one is present it the elevator ( all -1 )	then return the initial direction.
+	if (num_passengers(building) == 0)
+	{
+		elevator_direction.direction = INITIAL;
+		return elevator_direction.direction;
+	}
+
+
+	// if the elevator current direction is up, and if any 'one' passenger value is greater than current floor go up else go down.
+	for (int8_t i = 0; i < ELEVATOR_MAX_CAPACITY; i++)
+	{
+		if ((building.elevator.passengers[i] != -1 ) && (building.elevator.passengers[i] > building.elevator.currentFloor) && (elevator_direction.direction == UP || elevator_direction.direction == INITIAL))
+		{
+			return elevator_direction.direction = UP;
+		}
+	}
+
+	// if the elevator current direction is down, and if any 'one' passenger value is less than current floor go down else go up.
+	for (int8_t i = 0; i < ELEVATOR_MAX_CAPACITY; i++)
+	{
+		if ((building.elevator.passengers[i] != -1 ) && (building.elevator.passengers[i] < building.elevator.currentFloor) && (elevator_direction.direction == DOWN || elevator_direction.direction == INITIAL))
+		{
+			return elevator_direction.direction = DOWN;
+		}
+	}
+
+	// if the code comes here then the direction should be changed based on the closest stop.
+	
+	int8_t closest_stop = 0;
+	int8_t current_def = abs(building.elevator.currentFloor - building.elevator.passengers[closest_stop]);
+	if (building.elevator.passengers[0] == -1)
+	{
+		current_def = 100;
+	}
+	for (int8_t i = 1; i < ELEVATOR_MAX_CAPACITY; i++)
+	{
+		if ( (building.elevator.passengers[i] != -1) && (abs(building.elevator.passengers[i] - building.elevator.currentFloor) < current_def) )
+	{
+			closest_stop = i;
+		}
+	}
+
+	if (building.elevator.passengers[closest_stop] > building.elevator.currentFloor)
+	{
+		return elevator_direction.direction = UP;
+	}
+	else
+	{
+		return elevator_direction.direction = DOWN;
+	}
+}
+
+
+
+
+
+static int8_t get_next_stop(struct building_s building, int8_t direction)
+{
+	// default is the current location of the elevator.
+	int8_t next_stop = building.elevator.currentFloor;
+	int8_t num_passanger = num_passengers(building);
+	if (num_passanger < ELEVATOR_MAX_CAPACITY)
+	{
+		// if the current floor has departures, then go there.
+		if (building.floors[building.elevator.currentFloor].departures[0] != -1 || building.floors[building.elevator.currentFloor].departures[1] != -1)
+		{
+			return building.elevator.currentFloor;
+		}
+	}
+
+	// if any of the passengers desitination is here then return the current floor as the stop.
+	if (building.elevator.passengers[0] == building.elevator.currentFloor || building.elevator.passengers[1] == building.elevator.currentFloor || building.elevator.passengers[2] == building.elevator.currentFloor)
+	{
+		return building.elevator.currentFloor;
+	}
+
+
+	// this can be optimized and combined  with change in direction code. But will leave it here for now as its not affecting the performance.
+
+	if (direction == UP)
+	{
+		int8_t closest_index = 0;
+		int8_t current_def = building.elevator.currentFloor - building.elevator.passengers[0];
+		if (building.elevator.passengers[0] == -1)
+		{
+			 current_def = 100;
+		}
+		for (int8_t i = 1; i < ELEVATOR_MAX_CAPACITY; i++)
+		{
+			if (building.elevator.passengers[i] > building.elevator.currentFloor)
+			{
+				if ((building.elevator.passengers[i] != -1) &&  (abs(building.elevator.passengers[i] - building.elevator.currentFloor) < current_def))
+				{
+					closest_index = i;
+				}
+			}
+		}
+		next_stop = building.elevator.passengers[closest_index];
+	}
+	if (direction == DOWN)
+	{
+		int8_t closest_index = 0;
+		int8_t current_def = building.elevator.passengers[0] - building.elevator.currentFloor;
+		if (building.elevator.passengers[0] == -1)
+		{
+			current_def = 100;
+		}
+		
+
+		for (int8_t i = 1; i < ELEVATOR_MAX_CAPACITY; i++)
+		{
+			if (building.elevator.passengers[i] < building.elevator.currentFloor)
+			{
+				if ((building.elevator.passengers[i] != -1) &&  (building.elevator.currentFloor - building.elevator.passengers[i]) < current_def)
+				{
+					closest_index = i;
+				}
+			}
+		}
+		next_stop = building.elevator.passengers[closest_index];
+	}
+	
+	return next_stop;
+}
+
+
+
+
+
+
 static int8_t setNextElevatorStop(struct building_s building)
 {
-	return 0;
+
+	int8_t direction = get_elevator_direction(building);
+	if (direction == INITIAL){
+		// if the elevator is on the floor with the people in depature then wait. this will happen in the inital condition.
+		if (building.floors[building.elevator.currentFloor].departures[0] != -1 || building.floors[building.elevator.currentFloor].departures[1] != -1)
+		{
+			return building.elevator.currentFloor;
+		}
+		// else I landed in the state where the elevator is empty and the floor is empty. 
+		// check which floor has the non (-1) number of departures go there.
+		for (int8_t i = 0; i < BUILDING_HEIGHT; i++)
+		{
+			if (building.floors[i].departures[0] != -1 || building.floors[i].departures[1] != -1) // I am hardcoding the 0 and 1. I can use the for loop but I am lazy
+			{
+				return i;
+			}
+		}
+	}
+
+	// if the not initial then we need to either go up or down.
+	int8_t next_stop = get_next_stop(building, direction);
+	if (next_stop == -1)
+	{
+		elevator_direction.direction = INITIAL;
+		return 0;
+	}
+	return next_stop;
+
+	// // check if the elevator has all the passenger -1, then set the direction to the initial.
+
+	// printf("Elevator is on floor %i\n", building.elevator.currentFloor);
+	// printf("Departures: %i, %i\n", building.floors[building.elevator.currentFloor].departures[0], building.floors[building.elevator.currentFloor].departures[1]);
+	// printf("Arrivals: %i\n", building.floors[building.elevator.currentFloor].arrivals);
+	// return 0;
 }
 
 
