@@ -194,10 +194,20 @@ static int8_t get_next_stop(struct building_s building, int8_t direction)
 	return next_stop;
 }
 
+/*
+The Main idea is to:
+1. get the direction of the elevator moving in a particular direction. 
+2. If there are drops along the way do it.
+3. If there are any drop request along the way do it.
+4. if full then keep proceeding to the next stop.
 
+Note; The direction change happens when the passengers in the elevator are no longer have the destination along the direction of the travel.
 
-
-
+Possible improvements:
+1. The code can be optimized by combining the direction change and the next stop code.
+2. if you drop off all the passengers then elevator will search for the next floor with the passengers. This step does not account for the closet.
+*/
+ 
 
 static int8_t setNextElevatorStop(struct building_s building)
 {
