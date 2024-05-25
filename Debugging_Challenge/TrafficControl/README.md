@@ -39,9 +39,17 @@ Candidate Action Items:
 - Make any other improvements to the code as you see fit
 - Answer the following questions:
   - What would you tell the junior engineer about ways that they could improve their code in the future? (1-3 sentences)
-    - ADD YOUR ANSWER HERE
+    - Check the code initialization. and walk through the code and check the logic. ( I saw a nested if statement in the traffic code that was not assigning the correct value to the variable)
+    - I observed that code had syntax errors such as missing break statements in the switch case. which is a common mistake. But a good practice is to use the linter to catch these errors.
+    - Common place the code will stop running, please check the break logic. I saw the logic for the crash was not implemented correctly. 
+    - Begin of the function explain the code in a comment. this will help a new person to understand the code.
   - How else would you change this code to make it better so you can build on it in the future?(1-10 sentences).
-    - ADD YOUR ANSWER HERE
+    - The variables such as time counter 10, and other should be a constant/global variable which can changed from outside the function.
+    - The code east and west advance line can be a single function.
+    - The time involved in counting the time for each light can be a global variable. so that designer can adjust that time from outside the function.
+    - The code does not have to pause the simulation for the user to see the output. The code can be run in a loop and the output can be printed in the console.
+    - There is no logging in the code. This will help the developers and testers profile the code for bottlenecks and performance isssues. 
+    
 
 Don't forget; we are interested in both your solution and your thought process.
 
