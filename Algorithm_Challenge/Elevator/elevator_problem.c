@@ -24,10 +24,16 @@
 // Variable(s)
 //****************************************************************************
 struct building_s myBuilding;
-static bool first_run = true;
-#define SYNERGY_GAIN 2
-#define DISTANCE_GAIN 0.5
-#define CAPACITY_GAIN 4
+
+enum actions_e
+{
+	UP = 0,
+	DOWN,
+	OPEN,
+	ACTION_CNT
+};
+
+static const float costs[ACTION_CNT] = {1, 1, 3};
 
 //****************************************************************************
 // Private Function Prototype(s):
@@ -42,7 +48,8 @@ static void drawElevator(struct elevator_s elevator, int8_t doorStatus);
 static void delay(int16_t ms);
 
 static int nullCount(int null_val, int N, int data[]);
-
+static int getFloor(struct building_s building, enum actions_e action);
+static enum actions_e indexToActionEnum(int index);
 //****************************************************************************
 // Functions You (the Interviewee) Should Edit:
 //****************************************************************************
@@ -53,54 +60,25 @@ static int nullCount(int null_val, int N, int data[]);
 //Note: The output should be a number between 0 and (BUILDING_HEIGHT-1), inclusive
 static int8_t setNextElevatorStop(struct building_s building)
 {
-	// Start on the initial floor
-	if (first_run)
-	{
-		first_run = false;
-		return building.elevator.currentFloor;
-	}
+	// Assign a reward to each action
+	float rewards[ACTION_CNT] = {0};
 
-	// Assign a score to each floor
-	float scores[BUILDING_HEIGHT] = {0};
-	for (uint8_t i=0; i<BUILDING_HEIGHT; i++)
-	{
-		struct floor_s floor = building.floors[i];
-		// Calculate how many passengers need to be dropped off at this floor
-		float drop_off_cnt = 0;
-		for (uint8_t j=0; j<ELEVATOR_MAX_CAPACITY; j++)
-		{
-			int passenger_destination = building.elevator.passengers[j];
-			drop_off_cnt += (i == passenger_destination) ? (1) : (0);
-		}
-		const float synergy_score = SYNERGY_GAIN*drop_off_cnt;
-		
-		// Distance to floor
-		const float distance = abs(building.elevator.currentFloor - i);
-		const float distance_score = (distance == 0) ? (1) : (DISTANCE_GAIN*distance);
-		
-		// Waiting at floor
-		const float passengers_at_floor = 2 - nullCount(-1, 2, floor.departures);
-		const float remaining_capacity = ELEVATOR_MAX_CAPACITY - 
-				nullCount(-1, ELEVATOR_MAX_CAPACITY, building.elevator.passengers);
-		const float capacity_score = CAPACITY_GAIN*(remaining_capacity > passengers_at_floor);
-		scores[i] = synergy_score + capacity_score - distance_score;
-		printf("%.2f, %.2f, %.2f\n\r", synergy_score, capacity_score, distance_score);
-	}
+	// State: Departure, Passengers, Current Floor
+	// If I can drop people off and pick people up, Open
 
-	// Pick the highest scored floor
+
+	// greedy selection
 	float highest_val = 0;
 	int highest_index = 0;
-	for (uint8_t i=0; i<BUILDING_HEIGHT; i++)
+	for (uint8_t i=0; i<ACTION_CNT; i++)
 	{
-		printf("%.2f, ", scores[i]);
-		if (scores[i] > highest_val)
+		if (rewards[i] > highest_val)
 		{
-			highest_val = scores[i];
+			highest_val = rewards[i];
 			highest_index = i;
 		}
 	}
-	printf("\n");
-	return highest_index;
+	return getFloor(building, indexToActionEnum(highest_index));
 }
 
 
@@ -206,6 +184,41 @@ static int nullCount(int null_val, int N, int data[])
 		cnt += (int)(data[i] == null_val);		
 	}
 	return cnt;
+}
+
+static int getFloor(struct building_s building, enum actions_e action)
+{
+	int8_t floor;
+	switch (action)
+	{
+	case UP:
+		floor = building.elevator.currentFloor + 1; 
+		break;
+	case DOWN:
+		floor = building.elevator.currentFloor - 1;
+	case OPEN:
+	default:
+		floor = building.elevator.currentFloor;
+		break;
+	}
+	floor = max(0, min(floor, BUILDING_HEIGHT-1));
+	return floor;
+}
+
+static enum actions_e indexToActionEnum(int index)
+{
+	switch (index)
+	{
+	case 0:
+		return UP;
+		break;
+	case 1:
+		return DOWN;
+	case 2:
+	default:
+		return OPEN;
+		break;
+	}
 }
 
 static void initBuilding(void)
