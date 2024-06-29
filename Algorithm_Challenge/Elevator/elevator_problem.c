@@ -18,25 +18,17 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <math.h>
+#include <stdbool.h>
 
 //****************************************************************************
 // Variable(s)
 //****************************************************************************
 struct building_s myBuilding;
+static bool first_run = true;
+#define SYNERGY_GAIN 2
+#define DISTANCE_GAIN 0.5
+#define CAPACITY_GAIN 4
 
-// Interviewee
-#define COST_TO_MOVE 1
-#define COST_TO_OPEN 3
-
-struct building_stats_s
-{
-	float floor_means[BUILDING_HEIGHT];
-	float floor_std_devs[BUILDING_HEIGHT];
-	float elev_mean;
-	float elev_std_dev;
-};
-// Interviewee
 //****************************************************************************
 // Private Function Prototype(s):
 //****************************************************************************
@@ -49,13 +41,7 @@ static void drawFloor(struct floor_s floor, int8_t floorNumber, struct elevator_
 static void drawElevator(struct elevator_s elevator, int8_t doorStatus);
 static void delay(int16_t ms);
 
-// Interviewee
-static void calculateMeanAndStdDev(int N, float data[], float* mean, float* std_dev);
-static int numberOfValid(uint8_t N, int data[]);
-
-static struct building_stats_s updateBuildingStats(struct building_s building);
-// Interviewee
-
+static int nullCount(int null_val, int N, int data[]);
 
 //****************************************************************************
 // Functions You (the Interviewee) Should Edit:
@@ -67,9 +53,54 @@ static struct building_stats_s updateBuildingStats(struct building_s building);
 //Note: The output should be a number between 0 and (BUILDING_HEIGHT-1), inclusive
 static int8_t setNextElevatorStop(struct building_s building)
 {
-	struct building_stats_s stats = updateBuildingStats(building);
+	// Start on the initial floor
+	if (first_run)
+	{
+		first_run = false;
+		return building.elevator.currentFloor;
+	}
 
-	return 0;
+	// Assign a score to each floor
+	float scores[BUILDING_HEIGHT] = {0};
+	for (uint8_t i=0; i<BUILDING_HEIGHT; i++)
+	{
+		struct floor_s floor = building.floors[i];
+		// Calculate how many passengers need to be dropped off at this floor
+		float drop_off_cnt = 0;
+		for (uint8_t j=0; j<ELEVATOR_MAX_CAPACITY; j++)
+		{
+			int passenger_destination = building.elevator.passengers[j];
+			drop_off_cnt += (i == passenger_destination) ? (1) : (0);
+		}
+		const float synergy_score = SYNERGY_GAIN*drop_off_cnt;
+		
+		// Distance to floor
+		const float distance = abs(building.elevator.currentFloor - i);
+		const float distance_score = (distance == 0) ? (1) : (DISTANCE_GAIN*distance);
+		
+		// Waiting at floor
+		const float passengers_at_floor = 2 - nullCount(-1, 2, floor.departures);
+		const float remaining_capacity = ELEVATOR_MAX_CAPACITY - 
+				nullCount(-1, ELEVATOR_MAX_CAPACITY, building.elevator.passengers);
+		const float capacity_score = CAPACITY_GAIN*(remaining_capacity > passengers_at_floor);
+		scores[i] = synergy_score + capacity_score - distance_score;
+		printf("%.2f, %.2f, %.2f\n\r", synergy_score, capacity_score, distance_score);
+	}
+
+	// Pick the highest scored floor
+	float highest_val = 0;
+	int highest_index = 0;
+	for (uint8_t i=0; i<BUILDING_HEIGHT; i++)
+	{
+		printf("%.2f, ", scores[i]);
+		if (scores[i] > highest_val)
+		{
+			highest_val = scores[i];
+			highest_index = i;
+		}
+	}
+	printf("\n");
+	return highest_index;
 }
 
 
@@ -167,59 +198,15 @@ void main(void)
 //****************************************************************************
 // Private function(s):
 //****************************************************************************
-
-// Interviewee
-static void calculateMeanAndStdDev(int N, float data[], float* mean, float* std_dev)
+static int nullCount(int null_val, int N, int data[])
 {
-    float sum = 0;
-    for (int i = 0; i < N; i++)
-	 {
-        sum += (data[i] == -1) ? (0):(data[i]);
-    }
-    *mean = sum / N;
-
-    float values = 0;
-    for (int i = 0; i < N; i++) {
-        values += pow(data[i] - *mean, 2);
-    }
-    *std_dev = sqrt(values / N);
-}
-
-static int numberOfValid(uint8_t N, int data[])
-{
-	uint8_t cnt = 0;
-	for (int i=0; i<N; i++)
+	int cnt = 0;
+	for (uint8_t i = 0; i < N; i++)
 	{
-		cnt += (int)data[i] != -1;
+		cnt += (int)(data[i] == null_val);		
 	}
 	return cnt;
 }
-
-static struct building_stats_s updateBuildingStats(struct building_s building)
-{
-	struct building_stats_s ret;
-
-	// Update floor stats
-	for (uint8_t i = 0; i < BUILDING_HEIGHT; i++)
-	{
-		calculateMeanAndStdDev(
-			numberOfValid(2, building.floors[i].departures),
-			building.floors[i].departures,
-			&ret.floor_means[i],
-			&ret.floor_std_devs[i]);
-	}
-
-	// Update elevator stats
-	calculateMeanAndStdDev(
-		numberOfValid(ELEVATOR_MAX_CAPACITY, building.elevator.passengers),
-		building.elevator.passengers,
-		&ret.elev_mean,
-		&ret.elev_std_dev
-	);
-}
-
-// Interviewee
-
 
 static void initBuilding(void)
 {
