@@ -56,8 +56,6 @@ static int findMaxIndex(int N, float data[]);
 static int8_t setNextElevatorStop(struct building_s building)
 {
 	// Assign a score to each floor. Reward for passenger flux, penalize floor changes
-	int floor_deltas[BUILDING_HEIGHT] = {0};
-	int distances[BUILDING_HEIGHT] = {0};
 	float scores[BUILDING_HEIGHT] = {0};
 
 	// pick the highest flux floor
@@ -191,12 +189,12 @@ static int getPassengerDropOffCnt(struct building_s building, int floor_number)
 
 static int getDepartureCnt(struct building_s building, int floor_number)
 {
-	return 2 - nullCount(-1, 2, building.floors[floor_number].departures);
+	return 2 - nullCount(-1, 2, (int*)building.floors[floor_number].departures);
 }
 
 static int getPassengerCnt(struct building_s building)
 {
-	return ELEVATOR_MAX_CAPACITY - nullCount(-1, ELEVATOR_MAX_CAPACITY, building.elevator.passengers);
+	return ELEVATOR_MAX_CAPACITY - nullCount(-1, ELEVATOR_MAX_CAPACITY, (int*)building.elevator.passengers);
 }
 
 static int findMaxIndex(int N, float data[])
