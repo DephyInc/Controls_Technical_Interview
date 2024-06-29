@@ -24,7 +24,7 @@
 // Variable(s)
 //****************************************************************************
 struct building_s myBuilding;
-
+#define DROP_OFF_BIAS 2
 //****************************************************************************
 // Private Function Prototype(s):
 //****************************************************************************
@@ -37,7 +37,7 @@ static void drawFloor(struct floor_s floor, int8_t floorNumber, struct elevator_
 static void drawElevator(struct elevator_s elevator, int8_t doorStatus);
 static void delay(int16_t ms);
 
-static int nullCount(int null_val, int N, int data[]);
+static int nullCount(int null_val, int N, int8_t data[]);
 static int getPassengerDropOffCnt(struct building_s building, int floor_number);
 static int getDepartureCnt(struct building_s building, int floor_number);
 static int getPassengerCnt(struct building_s building);
@@ -61,10 +61,12 @@ static int8_t setNextElevatorStop(struct building_s building)
 	// pick the highest flux floor
 	for (int floor=0; floor<BUILDING_HEIGHT; floor++)
 	{
-		int passenger_delta = getPassengerDropOffCnt(building, floor) + getDepartureCnt(building, floor);
+		int drp_off_cnt = getPassengerDropOffCnt(building, floor);
+		int dpt_cnt = getDepartureCnt(building, floor);
+		int passenger_delta = 2*drp_off_cnt + dpt_cnt;
 		int distance = abs(building.elevator.currentFloor-floor);
-		scores[floor] = (getDepartureCnt(building, floor) == 0) ? (-1) : 
-					((BUILDING_HEIGHT*(float)passenger_delta) - (float)distance);
+		int floor_empty = getDepartureCnt(building, floor) == 0;
+		scores[floor] = ((BUILDING_HEIGHT*(float)passenger_delta) - (float)distance);
 	}
 	int highest_score_floor = findMaxIndex(BUILDING_HEIGHT, scores);
 	return highest_score_floor;
@@ -165,12 +167,13 @@ void main(void)
 //****************************************************************************
 // Private function(s):
 //****************************************************************************
-static int nullCount(int null_val, int N, int data[])
+static int nullCount(int null_val, int N, int8_t data[])
 {
 	int cnt = 0;
-	for (uint8_t i = 0; i < N; i++)
+	for (int i = 0; i < N; i++)
 	{
-		cnt += (int)(data[i] == null_val);		
+		int val = data[i];
+		cnt += (val == null_val);		
 	}
 	return cnt;
 }
@@ -189,12 +192,12 @@ static int getPassengerDropOffCnt(struct building_s building, int floor_number)
 
 static int getDepartureCnt(struct building_s building, int floor_number)
 {
-	return 2 - nullCount(-1, 2, (int*)building.floors[floor_number].departures);
+	return 2 - nullCount(-1, 2, building.floors[floor_number].departures);
 }
 
 static int getPassengerCnt(struct building_s building)
 {
-	return ELEVATOR_MAX_CAPACITY - nullCount(-1, ELEVATOR_MAX_CAPACITY, (int*)building.elevator.passengers);
+	return ELEVATOR_MAX_CAPACITY - nullCount(-1, ELEVATOR_MAX_CAPACITY, building.elevator.passengers);
 }
 
 static int findMaxIndex(int N, float data[])
