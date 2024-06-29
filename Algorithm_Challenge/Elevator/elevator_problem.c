@@ -46,7 +46,25 @@ static void delay(int16_t ms);
 //Note: The output should be a number between 0 and (BUILDING_HEIGHT-1), inclusive
 static int8_t setNextElevatorStop(struct building_s building)
 {
-	return rand() % BUILDING_HEIGHT;
+	for (uint8_t i=0; i<ELEVATOR_MAX_CAPACITY; i++)
+	{
+		// If there is someone in the elevator, service them
+		if (building.elevator.passengers[i] != -1)
+		{
+			// Take first person to their desination
+			return building.elevator.passengers[i];
+		}
+	}
+
+	for (uint8_t i=0; i<BUILDING_HEIGHT; i++)
+	{
+		// If someone is waiting at a floor, service them
+		if (building.floors[i].departures[0] != -1)
+		{
+			return i;
+		}
+	}
+	return 0;
 }
 
 
