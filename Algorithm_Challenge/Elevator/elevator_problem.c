@@ -18,12 +18,25 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <math.h>
 
 //****************************************************************************
 // Variable(s)
 //****************************************************************************
 struct building_s myBuilding;
 
+// Interviewee
+#define COST_TO_MOVE 1
+#define COST_TO_OPEN 3
+
+struct building_stats_s
+{
+	float floor_means[BUILDING_HEIGHT];
+	float floor_std_devs[BUILDING_HEIGHT];
+	float elev_mean;
+	float elev_std_dev;
+};
+// Interviewee
 //****************************************************************************
 // Private Function Prototype(s):
 //****************************************************************************
@@ -36,6 +49,14 @@ static void drawFloor(struct floor_s floor, int8_t floorNumber, struct elevator_
 static void drawElevator(struct elevator_s elevator, int8_t doorStatus);
 static void delay(int16_t ms);
 
+// Interviewee
+static void calculateMeanAndStdDev(int N, float data[], float* mean, float* std_dev);
+static int numberOfValid(uint8_t N, int data[]);
+
+static struct building_stats_s updateBuildingStats(struct building_s building);
+// Interviewee
+
+
 //****************************************************************************
 // Functions You (the Interviewee) Should Edit:
 //****************************************************************************
@@ -46,24 +67,8 @@ static void delay(int16_t ms);
 //Note: The output should be a number between 0 and (BUILDING_HEIGHT-1), inclusive
 static int8_t setNextElevatorStop(struct building_s building)
 {
-	for (uint8_t i=0; i<ELEVATOR_MAX_CAPACITY; i++)
-	{
-		// If there is someone in the elevator, service them
-		if (building.elevator.passengers[i] != -1)
-		{
-			// Take first person to their desination
-			return building.elevator.passengers[i];
-		}
-	}
+	struct building_stats_s stats = updateBuildingStats(building);
 
-	for (uint8_t i=0; i<BUILDING_HEIGHT; i++)
-	{
-		// If someone is waiting at a floor, service them
-		if (building.floors[i].departures[0] != -1)
-		{
-			return i;
-		}
-	}
 	return 0;
 }
 
@@ -162,6 +167,60 @@ void main(void)
 //****************************************************************************
 // Private function(s):
 //****************************************************************************
+
+// Interviewee
+static void calculateMeanAndStdDev(int N, float data[], float* mean, float* std_dev)
+{
+    float sum = 0;
+    for (int i = 0; i < N; i++)
+	 {
+        sum += (data[i] == -1) ? (0):(data[i]);
+    }
+    *mean = sum / N;
+
+    float values = 0;
+    for (int i = 0; i < N; i++) {
+        values += pow(data[i] - *mean, 2);
+    }
+    *std_dev = sqrt(values / N);
+}
+
+static int numberOfValid(uint8_t N, int data[])
+{
+	uint8_t cnt = 0;
+	for (int i=0; i<N; i++)
+	{
+		cnt += (int)data[i] != -1;
+	}
+	return cnt;
+}
+
+static struct building_stats_s updateBuildingStats(struct building_s building)
+{
+	struct building_stats_s ret;
+
+	// Update floor stats
+	for (uint8_t i = 0; i < BUILDING_HEIGHT; i++)
+	{
+		calculateMeanAndStdDev(
+			numberOfValid(2, building.floors[i].departures),
+			building.floors[i].departures,
+			&ret.floor_means[i],
+			&ret.floor_std_devs[i]);
+	}
+
+	// Update elevator stats
+	calculateMeanAndStdDev(
+		numberOfValid(ELEVATOR_MAX_CAPACITY, building.elevator.passengers),
+		building.elevator.passengers,
+		&ret.elev_mean,
+		&ret.elev_std_dev
+	);
+}
+
+// Interviewee
+
+
 static void initBuilding(void)
 {
 	memset(&myBuilding, -1, sizeof(struct building_s));
