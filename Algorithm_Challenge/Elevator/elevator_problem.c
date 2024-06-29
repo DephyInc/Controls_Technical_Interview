@@ -46,7 +46,7 @@ static void delay(int16_t ms);
 //Note: The output should be a number between 0 and (BUILDING_HEIGHT-1), inclusive
 static int8_t setNextElevatorStop(struct building_s building)
 {
-	return 0;
+	return rand() % BUILDING_HEIGHT;
 }
 
 
