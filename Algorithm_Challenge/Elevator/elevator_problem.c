@@ -18,12 +18,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <stdbool.h>
 
 //****************************************************************************
 // Variable(s)
 //****************************************************************************
 struct building_s myBuilding;
-
+#define DROP_OFF_BIAS 2
 //****************************************************************************
 // Private Function Prototype(s):
 //****************************************************************************
@@ -36,6 +37,14 @@ static void drawFloor(struct floor_s floor, int8_t floorNumber, struct elevator_
 static void drawElevator(struct elevator_s elevator, int8_t doorStatus);
 static void delay(int16_t ms);
 
+static int nullCount(int null_val, int N, int8_t data[]);
+static int getPassengerDropOffCnt(struct building_s building, int floor_number);
+static int getDepartureCnt(struct building_s building, int floor_number);
+static int getPassengerCnt(struct building_s building);
+static int findMaxIndex(int N, float data[]);
+
+#define MIN(i, j) (((i) < (j)) ? (i) : (j))
+#define MAX(i, j) (((i) > (j)) ? (i) : (j))
 //****************************************************************************
 // Functions You (the Interviewee) Should Edit:
 //****************************************************************************
@@ -46,7 +55,21 @@ static void delay(int16_t ms);
 //Note: The output should be a number between 0 and (BUILDING_HEIGHT-1), inclusive
 static int8_t setNextElevatorStop(struct building_s building)
 {
-	return 0;
+	// Assign a score to each floor. Reward for passenger flux, penalize floor changes
+	float scores[BUILDING_HEIGHT] = {0};
+
+	// pick the highest flux floor
+	for (int floor=0; floor<BUILDING_HEIGHT; floor++)
+	{
+		int drp_off_cnt = getPassengerDropOffCnt(building, floor);
+		int dpt_cnt = getDepartureCnt(building, floor);
+		int passenger_delta = 2*drp_off_cnt + dpt_cnt;
+		int distance = abs(building.elevator.currentFloor-floor);
+		int floor_empty = getDepartureCnt(building, floor) == 0;
+		scores[floor] = ((BUILDING_HEIGHT*(float)passenger_delta) - (float)distance);
+	}
+	int highest_score_floor = findMaxIndex(BUILDING_HEIGHT, scores);
+	return highest_score_floor;
 }
 
 
@@ -144,6 +167,55 @@ void main(void)
 //****************************************************************************
 // Private function(s):
 //****************************************************************************
+static int nullCount(int null_val, int N, int8_t data[])
+{
+	int cnt = 0;
+	for (int i = 0; i < N; i++)
+	{
+		int val = data[i];
+		cnt += (val == null_val);		
+	}
+	return cnt;
+}
+
+static int getPassengerDropOffCnt(struct building_s building, int floor_number)
+{
+	// Calculate how many passengers need to be dropped off at this floor
+	float drop_off_cnt = 0;
+	for (uint8_t passenger=0; passenger<ELEVATOR_MAX_CAPACITY; passenger++)
+	{
+		int passenger_destination = building.elevator.passengers[passenger];
+		drop_off_cnt += (floor_number == passenger_destination) ? (1) : (0);
+	}
+	return drop_off_cnt;
+}
+
+static int getDepartureCnt(struct building_s building, int floor_number)
+{
+	return 2 - nullCount(-1, 2, building.floors[floor_number].departures);
+}
+
+static int getPassengerCnt(struct building_s building)
+{
+	return ELEVATOR_MAX_CAPACITY - nullCount(-1, ELEVATOR_MAX_CAPACITY, building.elevator.passengers);
+}
+
+static int findMaxIndex(int N, float data[])
+{
+    int val = data[0]; 
+	int index = 0;
+    for (int i = 0; i < N; i++)
+	{ 
+        if (val < data[i])
+		{
+			val = data[i]; 
+			index = i;
+		} 
+    } 
+	return index;
+}
+
+
 static void initBuilding(void)
 {
 	memset(&myBuilding, -1, sizeof(struct building_s));

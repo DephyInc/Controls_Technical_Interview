@@ -27,17 +27,20 @@ struct intersection_s myIntersection;
 //****************************************************************************
 // Private Function Prototype(s):
 //****************************************************************************
-static void initIntersection(void);
-static char * setHorizantalTrafficLight(struct intersection_s intersection);
-static char * setVerticalTrafficLight(struct intersection_s intersection);
-static void advanceLane(char * trafficColor, struct lane_of_cars_s * lane);
+static void init(struct intersection_s* intersection);
+static traffic_light_colors_t charToEnum(char* strRep);
+static char* updateLight(clock_t* latchedTime, char* myLightColor, 
+	uint8_t redGreenTrans, uint8_t greenYellowTrans);
+static char* setHorizontalTrafficLight(struct intersection_s intersection);
+static char* setVerticalTrafficLight(struct intersection_s intersection);
+static void advanceLane(char * trafficColor, struct lane_of_cars_s* lane);
 static void drawIntersection(struct intersection_s intersection);
 static void drawUpperVerticalRoad(char * trafficColor, struct lane_of_cars_s northboundCars, struct lane_of_cars_s southboundCars);
 static void drawLowerVerticalRoad(char * trafficColor, struct lane_of_cars_s northboundCars, struct lane_of_cars_s southboundCars);
 static void drawWestboundLane(char * trafficColor, struct lane_of_cars_s westboundCars);
 static void drawEastboundLane(char * trafficColor, struct lane_of_cars_s eastboundCars);
 static void delay(int16_t ms);
-static int8_t checkForCrashes(void);
+static int8_t checkForCrashes(struct intersection_s intersection);
 
 //****************************************************************************
 // Public function(s):
@@ -50,18 +53,18 @@ void main(void)
 	srand(time(0));
 
 	//Initialize the intersection
-	initIntersection();
+	init(&myIntersection);
 
 	//Run traffic through the intersection for a set period of time
 	for(int8_t i = 0; i < 120; i++)
 	{
 		//Update the traffic lights
-		myIntersection.horizantalTrafficColor = setHorizantalTrafficLight(myIntersection);
+		myIntersection.horizontalTrafficColor = setHorizontalTrafficLight(myIntersection);
 		myIntersection.verticalTrafficColor = setVerticalTrafficLight(myIntersection);
 
 		//Advance the lanes if possible
-		advanceLane(myIntersection.horizantalTrafficColor, &myIntersection.westboundCars);
-		advanceLane(myIntersection.horizantalTrafficColor, &myIntersection.eastboundCars);
+		advanceLane(myIntersection.horizontalTrafficColor, &myIntersection.westboundCars);
+		advanceLane(myIntersection.horizontalTrafficColor, &myIntersection.eastboundCars);
 		advanceLane(myIntersection.verticalTrafficColor, &myIntersection.northboundCars);
 		advanceLane(myIntersection.verticalTrafficColor, &myIntersection.southboundCars);
 
@@ -72,7 +75,7 @@ void main(void)
 		delay(1000);
 
 		//Check to make sure no cars have crashed
-		if(checkForCrashes() == 1)
+		if(checkForCrashes(myIntersection) == 1)
 		{
 			printf("FAIL: Car crash!\n");
 			return;
@@ -97,125 +100,104 @@ void main(void)
 // Private function(s):
 //****************************************************************************
 
-static void initIntersection(void)
+static traffic_light_colors_t charToEnum(char* strRep)
 {
-	myIntersection.horizantalTrafficColor = "R";
-	myIntersection.verticalTrafficColor = "R";
-
-	myIntersection.eastboundCars.popularity = 3;
-	myIntersection.westboundCars.popularity = 5;
-	myIntersection.northboundCars.popularity = 2;
-	myIntersection.southboundCars.popularity = 4;
+	if (strcmp(strRep,"R") == 0)
+	{
+		return RED;
+	} else if (strcmp(strRep, "Y") == 0)
+	{
+		return YELLOW;
+	} else if (strcmp(strRep, "G") == 0)
+	{
+		return GREEN;
+	} else 
+	{
+		return YELLOW + 1;
+	}
 }
 
-static char * setHorizantalTrafficLight(struct intersection_s intersection)
+static void init(struct intersection_s* intersection)
 {
-	static int8_t t = 0;
-	char * currentColor = intersection.horizantalTrafficColor;
-	char * newColor = currentColor;
-	traffic_light_colors_t currentColorEnum = -1;
+	intersection->horizontalTrafficColor = "R";
+	intersection->verticalTrafficColor = "R";
 
-	if(strcmp(currentColor,"R") == 0)
+	intersection->horizontalGreenStartTime = clock();
+	intersection->verticalGreenStartTime = clock();
+
+	intersection->eastboundCars.popularity = 3;
+	intersection->westboundCars.popularity = 5;
+	intersection->northboundCars.popularity = 2;
+	intersection->southboundCars.popularity = 4;
+}
+
+static char* updateLight(clock_t* latchedTime, char* myLightColor, 
+	uint8_t redGreenTrans, uint8_t greenYellowTrans)
+{
+	traffic_light_colors_t enumColor = charToEnum(myLightColor);
+	if (enumColor > YELLOW)
 	{
-		currentColorEnum = RED;
-	}
-	else if(strcmp(currentColor,"G") == 0)
-	{
-		currentColorEnum = GREEN;
-
-		if(strcmp(currentColor,"Y") == 0)
-		{
-			currentColorEnum = YELLOW;
-		}
+		printf("Error Converting!");
+		enumColor = RED;
 	}
 
-	t++;
-	switch(currentColorEnum)
+	char* newColor = myLightColor;
+	switch(enumColor)
 	{
 		case RED:
-			if((intersection.eastboundCars.carsWaitingAtIntersection + intersection.westboundCars.carsWaitingAtIntersection >= intersection.northboundCars.carsWaitingAtIntersection + intersection.southboundCars.carsWaitingAtIntersection) && (strcmp(intersection.verticalTrafficColor,"R") == 0))
+			if(redGreenTrans)
 			{
 				newColor = "G";
-				t = 0;
+				*latchedTime = clock();
 			}
-
+			break;
 		case GREEN:
-			if((intersection.eastboundCars.carsWaitingAtIntersection + intersection.westboundCars.carsWaitingAtIntersection < intersection.northboundCars.carsWaitingAtIntersection + intersection.southboundCars.carsWaitingAtIntersection) || t > 10)
+			if(greenYellowTrans)
 			{
 				newColor = "Y";
-				t = 0;
+				*latchedTime = clock();
 			}
-
+			break;
 		case YELLOW:
-			if(t > 1)
+			if((clock() - *latchedTime)/CLOCKS_PER_SEC > 1.0f)
 			{
 				newColor = "R";
-				t = 0;
+				*latchedTime = clock();
 			}
-
+			break;
 		default:
-			newColor = "R";
-			t = 0;	
+			newColor = myLightColor;
+			break;
 	}
 
 	return newColor;
+}
+
+
+static char* setHorizontalTrafficLight(struct intersection_s intersection)
+{
+	const int8_t horizontalCarsWaiting = intersection.eastboundCars.carsWaitingAtIntersection + 
+		intersection.westboundCars.carsWaitingAtIntersection;
+	const int8_t verticalCarsWaiting = intersection.northboundCars.carsWaitingAtIntersection + 
+			intersection.southboundCars.carsWaitingAtIntersection;
+	
+	return updateLight(&intersection.horizontalGreenStartTime,
+		intersection.horizontalTrafficColor,
+		horizontalCarsWaiting >= verticalCarsWaiting && (strcmp(intersection.verticalTrafficColor,"R") == 0),
+		horizontalCarsWaiting < verticalCarsWaiting && ((clock() - intersection.horizontalGreenStartTime)/CLOCKS_PER_SEC > 10.0f));
 }
 
 static char * setVerticalTrafficLight(struct intersection_s intersection)
 {
-	static int8_t t = 0;
-	char * currentColor = intersection.verticalTrafficColor;
-	char * newColor = currentColor;
-	traffic_light_colors_t currentColorEnum = -1;
-
-	if(strcmp(currentColor,"R") == 0)
-	{
-		currentColorEnum = RED;
-
-		if(strcmp(currentColor,"G") == 0)
-		{	
-			currentColorEnum = GREEN;
-		}
-	}
-	else if(strcmp(currentColor,"Y") == 0)
-	{
-		currentColorEnum = YELLOW;
-	}
-
-	t++;
-	switch(currentColorEnum)
-	{
-		case RED:
-			if((intersection.eastboundCars.carsWaitingAtIntersection + intersection.westboundCars.carsWaitingAtIntersection < intersection.northboundCars.carsWaitingAtIntersection + intersection.southboundCars.carsWaitingAtIntersection) && (strcmp(intersection.horizantalTrafficColor,"R") == 0))
-			{
-				newColor = "G";
-				t = 0;
-			}
-			break;
-
-		case GREEN:
-			if((intersection.eastboundCars.carsWaitingAtIntersection + intersection.westboundCars.carsWaitingAtIntersection >= intersection.northboundCars.carsWaitingAtIntersection + intersection.southboundCars.carsWaitingAtIntersection) || t > 10)
-			{
-				newColor = "Y";
-				t = 0;
-			}
-			break;
-
-		case YELLOW:
-			if(t > 1)
-			{
-				newColor = "R";
-				t = 0;
-			}
-			break;
-
-		default:
-			newColor = "R";
-			t = 0;
-			break;	
-	}
-
-	return newColor;
+	const int8_t horizontalCarsWaiting = intersection.eastboundCars.carsWaitingAtIntersection + 
+		intersection.westboundCars.carsWaitingAtIntersection;
+	const int8_t verticalCarsWaiting = intersection.northboundCars.carsWaitingAtIntersection + 
+			intersection.southboundCars.carsWaitingAtIntersection;
+	
+	return updateLight(&intersection.verticalGreenStartTime,
+		intersection.verticalTrafficColor,
+		horizontalCarsWaiting < verticalCarsWaiting && (strcmp(intersection.horizontalTrafficColor,"R") == 0),
+		horizontalCarsWaiting >= verticalCarsWaiting && ((clock() - intersection.verticalGreenStartTime)/CLOCKS_PER_SEC > 10.0f));
 }
 
 static void advanceLane(char * trafficColor, struct lane_of_cars_s * lane)
@@ -259,9 +241,9 @@ static void advanceLane(char * trafficColor, struct lane_of_cars_s * lane)
 static void drawIntersection(struct intersection_s intersection)
 {
 	drawUpperVerticalRoad(intersection.verticalTrafficColor,intersection.northboundCars,intersection.southboundCars);
-	drawWestboundLane(intersection.horizantalTrafficColor,intersection.westboundCars);
+	drawWestboundLane(intersection.horizontalTrafficColor,intersection.westboundCars);
 	printf("----------          ---------- \n");
-	drawEastboundLane(intersection.horizantalTrafficColor,intersection.eastboundCars);
+	drawEastboundLane(intersection.horizontalTrafficColor,intersection.eastboundCars);
 	drawLowerVerticalRoad(intersection.verticalTrafficColor,intersection.northboundCars,intersection.southboundCars);
 }
 
@@ -422,11 +404,9 @@ static void delay(int16_t ms)
     while(clock() < startTime + ms);
 }
 
-static int8_t checkForCrashes(void)
+static int8_t checkForCrashes(struct intersection_s intersection)
 {
-	int8_t isHorizantalCarInIntersection = (myIntersection.westboundCars.carsInIntersection | myIntersection.eastboundCars.carsInIntersection);
-	int8_t isVerticalCarInIntersection = (myIntersection.westboundCars.carsInIntersection | myIntersection.eastboundCars.carsInIntersection);
-
-	if(isHorizantalCarInIntersection && isVerticalCarInIntersection){return 1;}
-	return 0;
+	int8_t isHorizontalCarInIntersection = (intersection.westboundCars.carsInIntersection | intersection.eastboundCars.carsInIntersection);
+	int8_t isVerticalCarInIntersection = (intersection.southboundCars.carsInIntersection | intersection.northboundCars.carsInIntersection);
+	return isHorizontalCarInIntersection && isVerticalCarInIntersection;
 }

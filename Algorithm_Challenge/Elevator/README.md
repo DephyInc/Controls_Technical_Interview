@@ -39,7 +39,13 @@ Candidate Action Items:
   above function, please do not edit the code that's already in the files, unless you are extremely certain that 
   there's a bug in the code.
 - Briefly describe your implementation (1-3 sentences).
-  - ADD YOUR ANSWER HERE
+  - My implementation assigns a score to each floor which accounts for distance and 
+  passenger flux. The score equation is:
+    BUILDING_HEIGHT*(Passenger Flux) - Distance where
+    Passenger Flux = Drop-off Count + Pick-up Count
+  This acts greedily and does not account for the cost of
+  motion, it only selects the action which moves the most
+  passengers. I chose this policy over the naive solution because it's implementation is very simple and its amenable to tuning.
 
 Don't forget; we are interested in both your solution and your thought process.
 
