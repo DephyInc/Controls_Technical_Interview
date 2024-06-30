@@ -28,6 +28,8 @@ struct intersection_s myIntersection;
 // Private Function Prototype(s):
 //****************************************************************************
 static void initIntersection(void);
+static traffic_light_colors_t charToEnum(char* strRep);
+static char* updateLight(struct intersection_s intersection, int8_t* t, char* currentColor);
 static char * setHorizontalTrafficLight(struct intersection_s intersection);
 static char * setVerticalTrafficLight(struct intersection_s intersection);
 static void advanceLane(char * trafficColor, struct lane_of_cars_s * lane);
@@ -96,6 +98,17 @@ void main(void)
 //****************************************************************************
 // Private function(s):
 //****************************************************************************
+static traffic_light_colors_t charToEnum(char* strRep)
+{
+	if(strcmp(strRep,"R") == 0)
+		return RED;
+	else if(strcmp(strRep,"G") == 0)
+		return GREEN;
+	else if(strcmp(strRep,"Y") == 0)
+		return YELLOW;
+	else
+		return -1;
+}
 
 static void initIntersection(void)
 {
@@ -108,114 +121,58 @@ static void initIntersection(void)
 	myIntersection.southboundCars.popularity = 4;
 }
 
-static char * setHorizontalTrafficLight(struct intersection_s intersection)
+static char* updateLight(struct intersection_s intersection, int8_t* t, char* currentColor)
 {
-	static int8_t t = 0;
-	char * currentColor = intersection.horizontalTrafficColor;
-	char * newColor = currentColor;
-	traffic_light_colors_t currentColorEnum = -1;
-
-	if(strcmp(currentColor,"R") == 0)
-	{
-		currentColorEnum = RED;
-	}
-	else if(strcmp(currentColor,"G") == 0)
-	{
-		currentColorEnum = GREEN;
- 
-		if(strcmp(currentColor,"Y") == 0)
-		{
-			currentColorEnum = YELLOW;
-		}
-	}
-
-	t++;
-	switch(currentColorEnum)
+	const int8_t horizontal_cars_waiting = intersection.eastboundCars.carsWaitingAtIntersection + 
+		intersection.westboundCars.carsWaitingAtIntersection;
+	const int8_t vertical_cars_waiting = intersection.northboundCars.carsWaitingAtIntersection + 
+			intersection.southboundCars.carsWaitingAtIntersection;
+	char* newColor = -1;
+	switch(charToEnum(currentColor))
 	{
 		case RED:
-			if((intersection.eastboundCars.carsWaitingAtIntersection + intersection.westboundCars.carsWaitingAtIntersection >= intersection.northboundCars.carsWaitingAtIntersection + intersection.southboundCars.carsWaitingAtIntersection) && (strcmp(intersection.verticalTrafficColor,"R") == 0))
+			if((horizontal_cars_waiting >= vertical_cars_waiting) && (strcmp(currentColor,"R") == 0))
 			{
 				newColor = "G";
-				t = 0;
+				*t = 0;
 			}
-
+			break;
 		case GREEN:
-			if((intersection.eastboundCars.carsWaitingAtIntersection + intersection.westboundCars.carsWaitingAtIntersection < intersection.northboundCars.carsWaitingAtIntersection + intersection.southboundCars.carsWaitingAtIntersection) || t > 10)
+			if((horizontal_cars_waiting < vertical_cars_waiting) || *t > 10)
 			{
 				newColor = "Y";
-				t = 0;
+				*t = 0;
 			}
-
+			break;
 		case YELLOW:
-			if(t > 1)
+			if(*t > 1)
 			{
 				newColor = "R";
-				t = 0;
+				*t = 0;
 			}
-
+			break;
 		default:
 			newColor = "R";
-			t = 0;	
+			*t = 0;	
+			break;
 	}
 
 	return newColor;
 }
 
+
+static char * setHorizontalTrafficLight(struct intersection_s intersection)
+{
+	static int8_t t = 0;
+	t++;
+	return updateLight(intersection, &t, intersection.horizontalTrafficColor);
+}
+
 static char * setVerticalTrafficLight(struct intersection_s intersection)
 {
 	static int8_t t = 0;
-	char * currentColor = intersection.verticalTrafficColor;
-	char * newColor = currentColor;
-	traffic_light_colors_t currentColorEnum = -1;
-
-	if(strcmp(currentColor,"R") == 0)
-	{
-		currentColorEnum = RED;
-
-		if(strcmp(currentColor,"G") == 0)
-		{	
-			currentColorEnum = GREEN;
-		}
-	}
-	else if(strcmp(currentColor,"Y") == 0)
-	{
-		currentColorEnum = YELLOW;
-	}
-
 	t++;
-	switch(currentColorEnum)
-	{
-		case RED:
-			if((intersection.eastboundCars.carsWaitingAtIntersection + intersection.westboundCars.carsWaitingAtIntersection < intersection.northboundCars.carsWaitingAtIntersection + intersection.southboundCars.carsWaitingAtIntersection) && (strcmp(intersection.horizontalTrafficColor,"R") == 0))
-			{
-				newColor = "G";
-				t = 0;
-			}
-			break;
-
-		case GREEN:
-			if((intersection.eastboundCars.carsWaitingAtIntersection + intersection.westboundCars.carsWaitingAtIntersection >= intersection.northboundCars.carsWaitingAtIntersection + intersection.southboundCars.carsWaitingAtIntersection) || t > 10)
-			{
-				newColor = "Y";
-				t = 0;
-			}
-			break;
-
-		case YELLOW:
-			if(t > 1)
-			{
-				newColor = "R";
-				t = 0;
-			}
-			break;
-
-		default:
-			newColor = "R";
-			t = 0;
-			break;	
-	}
-
-	return newColor;
+	return updateLight(intersection, &t, intersection.horizontalTrafficColor);
 }
 
 static void advanceLane(char * trafficColor, struct lane_of_cars_s * lane)
