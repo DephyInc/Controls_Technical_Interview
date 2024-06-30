@@ -27,19 +27,19 @@ struct intersection_s myIntersection;
 //****************************************************************************
 // Private Function Prototype(s):
 //****************************************************************************
-static void initIntersection(void);
+static void init(struct intersection_s* intersection);
 static traffic_light_colors_t charToEnum(char* strRep);
-static char* updateLight(struct intersection_s intersection, int8_t* t, char* currentColor);
-static char * setHorizontalTrafficLight(struct intersection_s intersection);
-static char * setVerticalTrafficLight(struct intersection_s intersection);
-static void advanceLane(char * trafficColor, struct lane_of_cars_s * lane);
+static char* updateLight(struct intersection_s intersection, int8_t* t, char* myLight, char* otherLightColor);
+static char* setHorizontalTrafficLight(struct intersection_s intersection);
+static char* setVerticalTrafficLight(struct intersection_s intersection);
+static void advanceLane(char * trafficColor, struct lane_of_cars_s* lane);
 static void drawIntersection(struct intersection_s intersection);
 static void drawUpperVerticalRoad(char * trafficColor, struct lane_of_cars_s northboundCars, struct lane_of_cars_s southboundCars);
 static void drawLowerVerticalRoad(char * trafficColor, struct lane_of_cars_s northboundCars, struct lane_of_cars_s southboundCars);
 static void drawWestboundLane(char * trafficColor, struct lane_of_cars_s westboundCars);
 static void drawEastboundLane(char * trafficColor, struct lane_of_cars_s eastboundCars);
 static void delay(int16_t ms);
-static int8_t checkForCrashes(void);
+static int8_t checkForCrashes(struct intersection_s intersection);
 
 //****************************************************************************
 // Public function(s):
@@ -52,7 +52,7 @@ void main(void)
 	srand(time(0));
 
 	//Initialize the intersection
-	initIntersection();
+	init(&myIntersection);
 
 	//Run traffic through the intersection for a set period of time
 	for(int8_t i = 0; i < 120; i++)
@@ -74,7 +74,7 @@ void main(void)
 		delay(1000);
 
 		//Check to make sure no cars have crashed
-		if(checkForCrashes() == 1)
+		if(checkForCrashes(myIntersection) == 1)
 		{
 			printf("FAIL: Car crash!\n");
 			return;
@@ -107,31 +107,31 @@ static traffic_light_colors_t charToEnum(char* strRep)
 	else if(strcmp(strRep,"Y") == 0)
 		return YELLOW;
 	else
-		return -1;
+		return RED;
 }
 
-static void initIntersection(void)
+static void init(struct intersection_s* intersection)
 {
-	myIntersection.horizontalTrafficColor = "R";
-	myIntersection.verticalTrafficColor = "R";
+	intersection->horizontalTrafficColor = "R";
+	intersection->verticalTrafficColor = "R";
 
-	myIntersection.eastboundCars.popularity = 3;
-	myIntersection.westboundCars.popularity = 5;
-	myIntersection.northboundCars.popularity = 2;
-	myIntersection.southboundCars.popularity = 4;
+	intersection->eastboundCars.popularity = 3;
+	intersection->westboundCars.popularity = 5;
+	intersection->northboundCars.popularity = 2;
+	intersection->southboundCars.popularity = 4;
 }
 
-static char* updateLight(struct intersection_s intersection, int8_t* t, char* currentColor)
+static char* updateLight(struct intersection_s intersection, int8_t* t, char* myLightColor, char* otherLightColor)
 {
 	const int8_t horizontal_cars_waiting = intersection.eastboundCars.carsWaitingAtIntersection + 
 		intersection.westboundCars.carsWaitingAtIntersection;
 	const int8_t vertical_cars_waiting = intersection.northboundCars.carsWaitingAtIntersection + 
 			intersection.southboundCars.carsWaitingAtIntersection;
-	char* newColor = -1;
-	switch(charToEnum(currentColor))
+	char* newColor = "R";
+	switch(charToEnum(myLightColor))
 	{
 		case RED:
-			if((horizontal_cars_waiting >= vertical_cars_waiting) && (strcmp(currentColor,"R") == 0))
+			if((horizontal_cars_waiting >= vertical_cars_waiting) && (strcmp(otherLightColor,"R") == 0))
 			{
 				newColor = "G";
 				*t = 0;
@@ -165,14 +165,14 @@ static char * setHorizontalTrafficLight(struct intersection_s intersection)
 {
 	static int8_t t = 0;
 	t++;
-	return updateLight(intersection, &t, intersection.horizontalTrafficColor);
+	return updateLight(intersection, &t, intersection.horizontalTrafficColor, intersection.verticalTrafficColor);
 }
 
 static char * setVerticalTrafficLight(struct intersection_s intersection)
 {
 	static int8_t t = 0;
 	t++;
-	return updateLight(intersection, &t, intersection.horizontalTrafficColor);
+	return updateLight(intersection, &t, intersection.verticalTrafficColor, intersection.horizontalTrafficColor);
 }
 
 static void advanceLane(char * trafficColor, struct lane_of_cars_s * lane)
@@ -379,11 +379,9 @@ static void delay(int16_t ms)
     while(clock() < startTime + ms);
 }
 
-static int8_t checkForCrashes(void)
+static int8_t checkForCrashes(struct intersection_s intersection)
 {
-	int8_t isHorizontalCarInIntersection = (myIntersection.westboundCars.carsInIntersection | myIntersection.eastboundCars.carsInIntersection);
-	int8_t isVerticalCarInIntersection = (myIntersection.southboundCars.carsInIntersection | myIntersection.northboundCars.carsInIntersection);
-
-	if(isHorizontalCarInIntersection && isVerticalCarInIntersection){return 1;}
-	return 0;
+	int8_t isHorizontalCarInIntersection = (intersection.westboundCars.carsInIntersection | intersection.eastboundCars.carsInIntersection);
+	int8_t isVerticalCarInIntersection = (intersection.southboundCars.carsInIntersection | intersection.northboundCars.carsInIntersection);
+	return isHorizontalCarInIntersection && isVerticalCarInIntersection;
 }
