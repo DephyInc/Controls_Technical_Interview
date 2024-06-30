@@ -44,7 +44,7 @@ struct lane_of_cars_s
 
 struct intersection_s
 {
-	char * horizantalTrafficColor;
+	char * horizontalTrafficColor;
 	char * verticalTrafficColor;
 
 	struct lane_of_cars_s eastboundCars;
