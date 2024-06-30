@@ -39,9 +39,12 @@ Candidate Action Items:
 - Make any other improvements to the code as you see fit
 - Answer the following questions:
   - What would you tell the junior engineer about ways that they could improve their code in the future? (1-3 sentences)
-    - ADD YOUR ANSWER HERE
+    - Note: the streetlights are still behaving erratically. 
+    I would tell them that they should create smaller functions to avoid duplicating code. I would also tell
+    them to check if their return types are valid, and to avoid static variables within functions. They can
+    also create individual variables for long lines, and invert if statements to reduce nesting. 
   - How else would you change this code to make it better so you can build on it in the future?(1-10 sentences).
-    - ADD YOUR ANSWER HERE
+    - I would restructure the code to use more user defined types. The use of char* required a lot of char literals in the code and it would be better to use the user defined enum type throughout. I would also create a streetlight struct that would contain items for the horizontal and vertical streetlights. This would allow the functions that require a single streetlight's data to not take that type rather than the entire intersection type.
 
 Don't forget; we are interested in both your solution and your thought process.
 

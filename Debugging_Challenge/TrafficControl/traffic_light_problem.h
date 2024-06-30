@@ -17,6 +17,7 @@
 // Include(s)
 //****************************************************************************
 #include <stdint.h>
+#include <time.h>
 
 //****************************************************************************
 // Definition(s)
@@ -44,8 +45,11 @@ struct lane_of_cars_s
 
 struct intersection_s
 {
-	char * horizontalTrafficColor;
-	char * verticalTrafficColor;
+	clock_t horizontalGreenStartTime;
+	clock_t verticalGreenStartTime;
+
+	char* horizontalTrafficColor;
+	char* verticalTrafficColor;
 
 	struct lane_of_cars_s eastboundCars;
 	struct lane_of_cars_s westboundCars;

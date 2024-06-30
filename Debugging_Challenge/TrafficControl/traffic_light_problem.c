@@ -29,7 +29,8 @@ struct intersection_s myIntersection;
 //****************************************************************************
 static void init(struct intersection_s* intersection);
 static traffic_light_colors_t charToEnum(char* strRep);
-static char* updateLight(struct intersection_s intersection, int8_t* t, char* myLight, char* otherLightColor);
+static char* updateLight(clock_t* latchedTime, char* myLightColor, 
+	uint8_t redGreenTrans, uint8_t greenYellowTrans);
 static char* setHorizontalTrafficLight(struct intersection_s intersection);
 static char* setVerticalTrafficLight(struct intersection_s intersection);
 static void advanceLane(char * trafficColor, struct lane_of_cars_s* lane);
@@ -98,16 +99,22 @@ void main(void)
 //****************************************************************************
 // Private function(s):
 //****************************************************************************
+
 static traffic_light_colors_t charToEnum(char* strRep)
 {
-	if(strcmp(strRep,"R") == 0)
+	if (strcmp(strRep,"R") == 0)
+	{
 		return RED;
-	else if(strcmp(strRep,"G") == 0)
-		return GREEN;
-	else if(strcmp(strRep,"Y") == 0)
+	} else if (strcmp(strRep, "Y") == 0)
+	{
 		return YELLOW;
-	else
-		return RED;
+	} else if (strcmp(strRep, "G") == 0)
+	{
+		return GREEN;
+	} else 
+	{
+		return YELLOW + 1;
+	}
 }
 
 static void init(struct intersection_s* intersection)
@@ -115,45 +122,51 @@ static void init(struct intersection_s* intersection)
 	intersection->horizontalTrafficColor = "R";
 	intersection->verticalTrafficColor = "R";
 
+	intersection->horizontalGreenStartTime = clock();
+	intersection->verticalGreenStartTime = clock();
+
 	intersection->eastboundCars.popularity = 3;
 	intersection->westboundCars.popularity = 5;
 	intersection->northboundCars.popularity = 2;
 	intersection->southboundCars.popularity = 4;
 }
 
-static char* updateLight(struct intersection_s intersection, int8_t* t, char* myLightColor, char* otherLightColor)
+static char* updateLight(clock_t* latchedTime, char* myLightColor, 
+	uint8_t redGreenTrans, uint8_t greenYellowTrans)
 {
-	const int8_t horizontal_cars_waiting = intersection.eastboundCars.carsWaitingAtIntersection + 
-		intersection.westboundCars.carsWaitingAtIntersection;
-	const int8_t vertical_cars_waiting = intersection.northboundCars.carsWaitingAtIntersection + 
-			intersection.southboundCars.carsWaitingAtIntersection;
-	char* newColor = "R";
-	switch(charToEnum(myLightColor))
+	traffic_light_colors_t enumColor = charToEnum(myLightColor);
+	if (enumColor > YELLOW)
+	{
+		printf("Error Converting!");
+		enumColor = RED;
+	}
+
+	char* newColor = myLightColor;
+	switch(enumColor)
 	{
 		case RED:
-			if((horizontal_cars_waiting >= vertical_cars_waiting) && (strcmp(otherLightColor,"R") == 0))
+			if(redGreenTrans)
 			{
 				newColor = "G";
-				*t = 0;
+				*latchedTime = clock();
 			}
 			break;
 		case GREEN:
-			if((horizontal_cars_waiting < vertical_cars_waiting) || *t > 10)
+			if(greenYellowTrans)
 			{
 				newColor = "Y";
-				*t = 0;
+				*latchedTime = clock();
 			}
 			break;
 		case YELLOW:
-			if(*t > 1)
+			if((clock() - *latchedTime)/CLOCKS_PER_SEC > 1.0f)
 			{
 				newColor = "R";
-				*t = 0;
+				*latchedTime = clock();
 			}
 			break;
 		default:
-			newColor = "R";
-			*t = 0;	
+			newColor = myLightColor;
 			break;
 	}
 
@@ -161,18 +174,30 @@ static char* updateLight(struct intersection_s intersection, int8_t* t, char* my
 }
 
 
-static char * setHorizontalTrafficLight(struct intersection_s intersection)
+static char* setHorizontalTrafficLight(struct intersection_s intersection)
 {
-	static int8_t t = 0;
-	t++;
-	return updateLight(intersection, &t, intersection.horizontalTrafficColor, intersection.verticalTrafficColor);
+	const int8_t horizontalCarsWaiting = intersection.eastboundCars.carsWaitingAtIntersection + 
+		intersection.westboundCars.carsWaitingAtIntersection;
+	const int8_t verticalCarsWaiting = intersection.northboundCars.carsWaitingAtIntersection + 
+			intersection.southboundCars.carsWaitingAtIntersection;
+	
+	return updateLight(&intersection.horizontalGreenStartTime,
+		intersection.horizontalTrafficColor,
+		horizontalCarsWaiting >= verticalCarsWaiting && (strcmp(intersection.verticalTrafficColor,"R") == 0),
+		horizontalCarsWaiting < verticalCarsWaiting && ((clock() - intersection.horizontalGreenStartTime)/CLOCKS_PER_SEC > 10.0f));
 }
 
 static char * setVerticalTrafficLight(struct intersection_s intersection)
 {
-	static int8_t t = 0;
-	t++;
-	return updateLight(intersection, &t, intersection.verticalTrafficColor, intersection.horizontalTrafficColor);
+	const int8_t horizontalCarsWaiting = intersection.eastboundCars.carsWaitingAtIntersection + 
+		intersection.westboundCars.carsWaitingAtIntersection;
+	const int8_t verticalCarsWaiting = intersection.northboundCars.carsWaitingAtIntersection + 
+			intersection.southboundCars.carsWaitingAtIntersection;
+	
+	return updateLight(&intersection.verticalGreenStartTime,
+		intersection.verticalTrafficColor,
+		horizontalCarsWaiting < verticalCarsWaiting && (strcmp(intersection.horizontalTrafficColor,"R") == 0),
+		horizontalCarsWaiting >= verticalCarsWaiting && ((clock() - intersection.verticalGreenStartTime)/CLOCKS_PER_SEC > 10.0f));
 }
 
 static void advanceLane(char * trafficColor, struct lane_of_cars_s * lane)
