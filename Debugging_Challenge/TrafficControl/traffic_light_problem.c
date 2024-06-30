@@ -382,7 +382,7 @@ static void delay(int16_t ms)
 static int8_t checkForCrashes(void)
 {
 	int8_t isHorizontalCarInIntersection = (myIntersection.westboundCars.carsInIntersection | myIntersection.eastboundCars.carsInIntersection);
-	int8_t isVerticalCarInIntersection = (myIntersection.westboundCars.carsInIntersection | myIntersection.eastboundCars.carsInIntersection);
+	int8_t isVerticalCarInIntersection = (myIntersection.southboundCars.carsInIntersection | myIntersection.northboundCars.carsInIntersection);
 
 	if(isHorizontalCarInIntersection && isVerticalCarInIntersection){return 1;}
 	return 0;
